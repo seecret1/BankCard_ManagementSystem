@@ -1,4 +1,4 @@
-package com.github.seecret1.bank_card_management_system.dto.response;
+package com.github.seecret1.bank_card_management_system.dto.request;
 
 import com.github.seecret1.bank_card_management_system.entity.enums.RoleType;
 import lombok.AllArgsConstructor;
@@ -9,7 +9,13 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor
-public class UserResponse {
+public class CreateUserRequest {
+
+    private String username;
+
+    private String email;
+
+    private String password;
 
     private String firstName;
 
@@ -21,5 +27,5 @@ public class UserResponse {
 
     private Set<RoleType> roles;
 
-    private Set<String> cards;
+    private String card_id;
 }

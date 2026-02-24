@@ -4,22 +4,13 @@ import com.github.seecret1.bank_card_management_system.entity.enums.RoleType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
-public class UserResponse {
+public class UserAuthenticationResponse {
 
-    private String firstName;
-
-    private String lastName;
-
-    private String middleName;
-
-    private LocalDate birth_date;
+    private String email;
 
     private Set<RoleType> roles;
-
-    private Set<String> cards;
 }
