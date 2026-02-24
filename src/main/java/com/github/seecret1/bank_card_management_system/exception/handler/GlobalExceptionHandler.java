@@ -6,8 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import javax.security.sasl.AuthenticationException;
-
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -28,9 +26,9 @@ public class GlobalExceptionHandler {
                 .body("CheckPasswordException: " + ex.getMessage());
     }
 
-    @ExceptionHandler(EmailExistsException.class)
+    @ExceptionHandler(RegisterUserException.class)
     public ResponseEntity<String> handleEmailExistsException(
-            EmailExistsException ex
+            RegisterUserException ex
     ) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body("EmailExistsException: " + ex.getMessage());

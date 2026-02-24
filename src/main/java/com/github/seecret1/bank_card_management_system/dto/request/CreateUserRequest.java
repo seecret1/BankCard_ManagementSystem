@@ -27,5 +27,5 @@ public class CreateUserRequest {
 
     private Set<RoleType> roles;
 
-    private String card_id;
+    private Set<String> cards;
 }

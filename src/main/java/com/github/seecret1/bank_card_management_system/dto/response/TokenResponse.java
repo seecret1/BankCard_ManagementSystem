@@ -1,11 +1,11 @@
-package com.github.seecret1.bank_card_management_system.dto;
+package com.github.seecret1.bank_card_management_system.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class JwtAuthenticationDto {
+public class TokenResponse {
 
     private String token;
 
