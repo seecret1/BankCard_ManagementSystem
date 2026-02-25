@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse findUserByEmail(String email) {
+    public UserResponse findByEmail(String email) {
         log.info("Call method findUserByEmail");
         return userMapper.toResponse(userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(
@@ -75,9 +75,8 @@ public class UserServiceImpl implements UserService {
                 request.getFirstName() == null || request.getFirstName().isBlank() ||
                 request.getLastName() == null || request.getLastName().isBlank() ||
                 request.getMiddleName() == null || request.getMiddleName().isBlank() ||
-                request.getBirth_date().isBefore(LocalDate.now()) ||
-                request.getRoles() == null || request.getRoles().isEmpty() ||
-                request.getCards() == null || request.getCards().isEmpty()) {
+                request.getBirthDate().isAfter(LocalDate.now()) ||
+                request.getRole() == null) {
 
             throw new IllegalArgumentException("Invalid Request for create user");
         }

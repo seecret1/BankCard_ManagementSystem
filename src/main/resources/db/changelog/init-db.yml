@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: create_usr_product_order_tables
+      id: create_users_cards_tables
       author: seecret1
       changes:
         - createTable:
@@ -8,8 +8,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: UUID
-                  autoIncrement: true
+                  type: VARCHAR
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -61,8 +60,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: UUID
-                  autoIncrement: true
+                  type: VARCHAR
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -94,7 +92,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: user_id
-                  type: BIGINT
+                  type: VARCHAR
                   constraints:
                     nullable: false
 
@@ -104,3 +102,4 @@ databaseChangeLog:
             baseColumnNames: user_id
             referencedTableName: users
             referencedColumnNames: id
+            onDelete: CASCADE

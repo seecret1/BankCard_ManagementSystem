@@ -2,5 +2,17 @@ server:
   port: 8081
 
 spring:
-  application:
-    name: BankCard_ManagementSystem
+  liquibase:
+    change-log: classpath:db/master.xml
+  datasource:
+    url: jdbc:postgresql://localhost:5433/bank_db
+    username: ${USERNAME_DB}
+    password: ${PASSWORD_DB}
+    hikari:
+      schema: bank_schema
+      connection-init-sql: CREATE SCHEMA IF NOT EXISTS bank_schema
+      connection-timeout: 10000
+
+  jpa:
+    generate-ddl: false
+    open-in-view: false

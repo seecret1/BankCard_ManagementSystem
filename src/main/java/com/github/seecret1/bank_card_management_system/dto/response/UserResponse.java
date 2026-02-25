@@ -1,15 +1,24 @@
 package com.github.seecret1.bank_card_management_system.dto.response;
 
+import com.github.seecret1.bank_card_management_system.dto.CardDto;
 import com.github.seecret1.bank_card_management_system.entity.enums.RoleType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.Set;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class UserResponse {
+
+    private String username;
+
+    private String email;
+
+    private String password;
 
     private String firstName;
 
@@ -17,9 +26,9 @@ public class UserResponse {
 
     private String middleName;
 
-    private LocalDate birth_date;
+    private LocalDate birthDate;
 
-    private Set<RoleType> roles;
+    private RoleType role;
 
-    private Set<String> cards;
+    private Set<CardDto> cards;
 }

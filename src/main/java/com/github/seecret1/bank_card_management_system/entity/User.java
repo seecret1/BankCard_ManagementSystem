@@ -35,10 +35,10 @@ public class User {
 
     private String middleName;
 
-    private LocalDate birth_date;
+    private LocalDate birthDate;
 
-    private Set<RoleType> roles = new HashSet<>();
+    private RoleType role;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Card> cards = new HashSet<>();
 }

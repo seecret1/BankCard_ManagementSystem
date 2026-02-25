@@ -14,7 +14,7 @@ public interface UserService {
 
     UserResponse findByUsername(String username);
 
-    UserResponse findUserByEmail(String email);
+    UserResponse findByEmail(String email);
 
     UserResponse create(CreateUserRequest request);
 

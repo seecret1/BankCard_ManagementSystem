@@ -24,15 +24,16 @@ public class Card {
 
     private String number;
 
-    private LocalDate date_activation;
+    private LocalDate dateActivation;
 
-    private LocalDate date_expiry;
+    private LocalDate dateExpiry;
 
+    @Enumerated(EnumType.STRING)
     private CardStatus status;
 
     private BigDecimal balance;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
