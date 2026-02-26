@@ -16,3 +16,9 @@ spring:
   jpa:
     generate-ddl: false
     open-in-view: false
+
+user-service:
+  jwt:
+    secret: MyVeryLongAndSecureSecretKeyForJWTTokenSigningThatIsAtLeast64CharactersLongToMeetHS512Requirements123456789
+    tokenExpiration: 1m
+    refreshTokenExpiration: 30m
