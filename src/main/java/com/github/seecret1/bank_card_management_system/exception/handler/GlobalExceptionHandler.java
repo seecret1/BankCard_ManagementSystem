@@ -1,69 +1,87 @@
 package com.github.seecret1.bank_card_management_system.exception.handler;
 
+import com.github.seecret1.bank_card_management_system.dto.response.ErrorResponse;
 import com.github.seecret1.bank_card_management_system.exception.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.time.LocalDateTime;
+
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthException.class)
-    public ResponseEntity<String> handleAuthException(
+    public ResponseEntity<ErrorResponse> handleAuthException(
             AuthException ex
     ) {
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body("AuthException: " + ex.getMessage());
+        log.error("GlobalRestControllerAdvice -> AuthException: " + ex.getMessage());
+        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
     @ExceptionHandler(CheckPasswordException.class)
-    public ResponseEntity<String> handleCheckPasswordException(
+    public ResponseEntity<ErrorResponse> handleCheckPasswordException(
             CheckPasswordException ex
     ) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("CheckPasswordException: " + ex.getMessage());
+        log.error("GlobalRestControllerAdvice -> CheckPasswordException: " + ex);
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(RegisterUserException.class)
-    public ResponseEntity<String> handleEmailExistsException(
+    public ResponseEntity<ErrorResponse> handleEmailExistsException(
             RegisterUserException ex
     ) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body("EmailExistsException: " + ex.getMessage());
+        log.error("GlobalRestControllerAdvice -> RegisterUserException: " + ex);
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(RefreshTokenException.class)
-    public ResponseEntity<String> handleRefreshTokenException(
+    public ResponseEntity<ErrorResponse> handleRefreshTokenException(
             RefreshTokenException ex
     ) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body("RefreshTokenException: " + ex.getMessage());
+        log.error("GlobalRestControllerAdvice -> RefreshTokenException: " + ex);
+        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
     @ExceptionHandler(TokenParseException.class)
-    public ResponseEntity<String> handleTokenParseException(
+    public ResponseEntity<ErrorResponse> handleTokenParseException(
             TokenParseException ex
     ) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("TokenParseException: " + ex.getMessage());
+        log.error("GlobalRestControllerAdvice -> TokenParseException: " + ex);
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFoundException(
+    public ResponseEntity<ErrorResponse> handleUserNotFoundException(
             UserNotFoundException ex
     ) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("UserNotFoundException: " + ex.getMessage());
+        log.error("GlobalRestControllerAdvice -> UserNotFoundException: " + ex);
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(
+    public ResponseEntity<ErrorResponse> handleException(
             Exception ex
     ) {
+        log.error("GlobalRestControllerAdvice -> Exception: " + ex);
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    }
+
+    private ResponseEntity<ErrorResponse> buildResponse(
+            HttpStatus status,
+            String message
+    ) {
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("An error occurred: " + ex.getMessage());
+                .status(status)
+                .body(ErrorResponse
+                        .builder()
+                        .status(status.value())
+                        .message(message)
+                        .timestamp(LocalDateTime.now())
+                        .build()
+                );
     }
 }

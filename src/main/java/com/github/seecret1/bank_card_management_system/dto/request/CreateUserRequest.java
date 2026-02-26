@@ -1,5 +1,6 @@
 package com.github.seecret1.bank_card_management_system.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.seecret1.bank_card_management_system.entity.enums.RoleType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -37,9 +38,8 @@ public class CreateUserRequest {
 
     private String middleName;
 
-    @NotBlank(message = "Birth date must be set!")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
 
+    @NotNull
     private RoleType role;
 }
