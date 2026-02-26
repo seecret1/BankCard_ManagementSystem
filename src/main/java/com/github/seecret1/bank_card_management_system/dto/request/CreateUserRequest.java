@@ -27,17 +27,17 @@ public class CreateUserRequest {
     @Size(min = 8, message = "Size of password must start from {min}")
     private String password;
 
-    @NotBlank(message = "First name mast be set!")
+    @NotBlank(message = "First name must be set!")
     @Size(max = 80, message = "Size of first name must start to {max}")
     private String firstName;
 
-    @NotBlank(message = "Last name mast be set!")
+    @NotBlank(message = "Last name must be set!")
     @Size(max = 100, message = "Size of first name must start to {max}")
     private String lastName;
 
     private String middleName;
 
-    @NotBlank(message = "Birth date mast be set!")
+    @NotBlank(message = "Birth date must be set!")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
 
