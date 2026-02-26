@@ -4,7 +4,6 @@ import com.github.seecret1.bank_card_management_system.dto.request.CreateUserReq
 import com.github.seecret1.bank_card_management_system.dto.request.UpdateUserRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.UserResponse;
 import com.github.seecret1.bank_card_management_system.entity.User;
-import com.github.seecret1.bank_card_management_system.exception.CheckPasswordException;
 import com.github.seecret1.bank_card_management_system.exception.RegisterUserException;
 import com.github.seecret1.bank_card_management_system.exception.UserNotFoundException;
 import com.github.seecret1.bank_card_management_system.mapper.UserMapper;
@@ -15,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
-import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -29,38 +27,44 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponse> findAllUsers() {
-        log.info("Call method findAllUsers");
-        return userMapper.toListResponse(userRepository.findAll());
+        log.info("Find all users");
+        List<User> users = userRepository.findAll();
+
+        log.debug("Users list: {}, size list: {}", users, users.size());
+        return userMapper.toListResponse(users);
     }
 
     @Override
     public UserResponse findById(String id) {
-        log.info("Call method findById");
-        return userMapper.toResponse(userRepository.findById(id)
+        log.info("Find user by ID: {}", id);
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(
                         "User not found with id: " + id
-                ))
-        );
+                ));
+        log.debug("Found by id user: {}", user);
+        return userMapper.toResponse(user);
     }
 
     @Override
     public UserResponse findByUsername(String username) {
-        log.info("Call method findByUsername");
-        return userMapper.toResponse(userRepository.findByUsername(username)
+        log.info("Find user by username: {}", username);
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(
                         "User not found with username: " + username
-                ))
-        );
+                ));
+        log.debug("Found by username user: {}", user);
+        return userMapper.toResponse(user);
     }
 
     @Override
     public UserResponse findByEmail(String email) {
         log.info("Call method findUserByEmail");
-        return userMapper.toResponse(userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(
                         "User not found with email: " + email
-                ))
-        );
+                ));
+        log.debug("Found by email user: {}", user);
+        return userMapper.toResponse(user);
     }
 
     @Override
@@ -70,9 +74,6 @@ public class UserServiceImpl implements UserService {
         var username = request.getUsername();
         var email = request.getEmail();
 
-        if (!validation(request)) {
-            throw new IllegalArgumentException("Invalid Request for create user");
-        }
         if (userRepository.existsByUsernameOrEmail(username, email)) {
             throw new RegisterUserException(
                     MessageFormat.format(
@@ -83,29 +84,25 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = userRepository.save(userMapper.toEntity(request));
-        log.info("success create user");
+        log.debug("Success create user: {}", user);
         return userMapper.toResponse(user);
     }
 
     @Override
     public UserResponse updateFull(String id, CreateUserRequest request) {
-        log.info("Call method updateFull");
-
-        if (!validation(request)) {
-            throw new IllegalArgumentException("Invalid Request for create user");
-        }
+        log.info("Update user by id: {}", id);
 
         var userToUpdate = userMapper.toEntity(request);
         userToUpdate.setId(id);
         userRepository.save(userToUpdate);
 
-        log.info("success full update user");
+        log.debug("Success full update user: {}", userToUpdate);
         return userMapper.toResponse(userToUpdate);
     }
 
     @Override
     public UserResponse update(String id, UpdateUserRequest request) {
-        log.info("Call method update");
+        log.info("Update user by ID: {}", id);
 
         var userUpdate = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(
@@ -122,28 +119,14 @@ public class UserServiceImpl implements UserService {
             userUpdate.setPassword(request.getPassword());
         }
         userRepository.save(userUpdate);
-        log.info("success update user");
+        log.debug("Success update user: {}", userUpdate);
         return userMapper.toResponse(userUpdate);
     }
 
     @Override
     public void delete(String id) {
-        log.info("Call method delete");
+        log.info("Delete user by ID: {}", id);
         userRepository.deleteById(id);
-    }
-
-    private boolean validation(CreateUserRequest request) {
-        if (request.getUsername() == null || request.getUsername().isBlank() ||
-                request.getEmail() == null || request.getEmail().isBlank() ||
-                request.getPassword() == null || request.getPassword().isBlank() ||
-                request.getFirstName() == null || request.getFirstName().isBlank() ||
-                request.getLastName() == null || request.getLastName().isBlank() ||
-                request.getMiddleName() == null || request.getMiddleName().isBlank() ||
-                request.getBirthDate().isAfter(LocalDate.now()) ||
-                request.getRole() == null) {
-
-            return false;
-        }
-        return true;
+        log.debug("Success delete user by ID: {}", id);
     }
 }
