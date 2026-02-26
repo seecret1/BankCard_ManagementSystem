@@ -26,12 +26,12 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: password
-                  type: VARCHAR(55)
+                  type: VARCHAR(50)
                   constraints:
                     nullable: false
               - column:
                   name: first_name
-                  type: VARCHAR(100)
+                  type: VARCHAR(80)
                   constraints:
                     nullable: false
               - column:
@@ -43,7 +43,7 @@ databaseChangeLog:
                   name: middle_name
                   type: VARCHAR(100)
                   constraints:
-                    nullable: false
+                    nullable: true
               - column:
                   name: birth_date
                   type: date

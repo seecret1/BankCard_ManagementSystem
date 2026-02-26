@@ -4,7 +4,6 @@ import com.github.seecret1.bank_card_management_system.entity.enums.RoleType;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 @Data
 public class UserInfoResponse {

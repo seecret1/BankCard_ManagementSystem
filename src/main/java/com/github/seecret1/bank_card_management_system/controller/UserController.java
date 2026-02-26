@@ -30,14 +30,14 @@ public class UserController {
         return ResponseEntity.ok(userService.findById(id));
     }
 
-    @GetMapping("/{email}")
+    @GetMapping("/email/{email}")
     public ResponseEntity<UserResponse> findByEmail(
             @PathVariable String email
     ) {
         return ResponseEntity.ok(userService.findByEmail(email));
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/username/{username}")
     public ResponseEntity<UserResponse> findByUsername(
             @PathVariable String username
     ) {
@@ -52,7 +52,15 @@ public class UserController {
                 .body(userService.create(request));
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update/put/{id}")
+    public ResponseEntity<UserResponse> updateFull(
+            @PathVariable String id,
+            @RequestBody CreateUserRequest request
+    ) {
+        return ResponseEntity.ok(userService.updateFull(id, request));
+    }
+
+    @PatchMapping("/update/path/{id}")
     public ResponseEntity<UserResponse> update(
             @PathVariable String id,
             @RequestBody UpdateUserRequest request

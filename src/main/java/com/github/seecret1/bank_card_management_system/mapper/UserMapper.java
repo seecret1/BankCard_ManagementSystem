@@ -38,6 +38,7 @@ public class UserMapper {
         userInfo.setBirthDate(birthDate);
         userInfo.setRole(role);
 
+        response.setId(user.getId());
         response.setUsername(username);
         response.setEmail(email);
         response.setPassword(user.getPassword());
