@@ -18,6 +18,8 @@ public interface UserService {
 
     UserResponse create(CreateUserRequest request);
 
+    UserResponse updateFull(String id, CreateUserRequest request);
+
     UserResponse update(String id, UpdateUserRequest request);
 
     void delete(String id);

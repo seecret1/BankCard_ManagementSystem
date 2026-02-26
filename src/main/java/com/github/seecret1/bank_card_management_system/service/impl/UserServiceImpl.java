@@ -4,6 +4,7 @@ import com.github.seecret1.bank_card_management_system.dto.request.CreateUserReq
 import com.github.seecret1.bank_card_management_system.dto.request.UpdateUserRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.UserResponse;
 import com.github.seecret1.bank_card_management_system.entity.User;
+import com.github.seecret1.bank_card_management_system.exception.CheckPasswordException;
 import com.github.seecret1.bank_card_management_system.exception.RegisterUserException;
 import com.github.seecret1.bank_card_management_system.exception.UserNotFoundException;
 import com.github.seecret1.bank_card_management_system.mapper.UserMapper;
@@ -69,21 +70,14 @@ public class UserServiceImpl implements UserService {
         var username = request.getUsername();
         var email = request.getEmail();
 
-        if (username == null || username.isBlank() ||
-                email == null || email.isBlank() ||
-                request.getPassword() == null || request.getPassword().isBlank() ||
-                request.getFirstName() == null || request.getFirstName().isBlank() ||
-                request.getLastName() == null || request.getLastName().isBlank() ||
-                request.getMiddleName() == null || request.getMiddleName().isBlank() ||
-                request.getBirthDate().isAfter(LocalDate.now()) ||
-                request.getRole() == null) {
-
+        if (!validation(request)) {
             throw new IllegalArgumentException("Invalid Request for create user");
         }
         if (userRepository.existsByUsernameOrEmail(username, email)) {
             throw new RegisterUserException(
                     MessageFormat.format(
-                            "User by username {0} or email {1} exists", username, email
+                            "User by username {0} or email {1} exists",
+                            username, email
                     )
             );
         }
@@ -91,6 +85,22 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.save(userMapper.toEntity(request));
         log.info("success create user");
         return userMapper.toResponse(user);
+    }
+
+    @Override
+    public UserResponse updateFull(String id, CreateUserRequest request) {
+        log.info("Call method updateFull");
+
+        if (!validation(request)) {
+            throw new IllegalArgumentException("Invalid Request for create user");
+        }
+
+        var userToUpdate = userMapper.toEntity(request);
+        userToUpdate.setId(id);
+        userRepository.save(userToUpdate);
+
+        log.info("success full update user");
+        return userMapper.toResponse(userToUpdate);
     }
 
     @Override
@@ -120,5 +130,20 @@ public class UserServiceImpl implements UserService {
     public void delete(String id) {
         log.info("Call method delete");
         userRepository.deleteById(id);
+    }
+
+    private boolean validation(CreateUserRequest request) {
+        if (request.getUsername() == null || request.getUsername().isBlank() ||
+                request.getEmail() == null || request.getEmail().isBlank() ||
+                request.getPassword() == null || request.getPassword().isBlank() ||
+                request.getFirstName() == null || request.getFirstName().isBlank() ||
+                request.getLastName() == null || request.getLastName().isBlank() ||
+                request.getMiddleName() == null || request.getMiddleName().isBlank() ||
+                request.getBirthDate().isAfter(LocalDate.now()) ||
+                request.getRole() == null) {
+
+            return false;
+        }
+        return true;
     }
 }
