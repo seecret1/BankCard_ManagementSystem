@@ -2,7 +2,6 @@ package com.github.seecret1.bank_card_management_system.security;
 
 import com.github.seecret1.bank_card_management_system.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,7 @@ public class CustomUserServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         var user =  userRepository.findByEmail(username).orElseThrow(
                 () -> new UsernameNotFoundException(
                         "User not found with username: " + username
