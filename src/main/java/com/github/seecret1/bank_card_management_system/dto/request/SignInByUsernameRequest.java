@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class AuthenticationByUsernameRequest {
+public class SignInByUsernameRequest {
 
     @NotBlank(message = "Username must be set!")
     @Size(min = 8, message = "Size of username must start from {min}")

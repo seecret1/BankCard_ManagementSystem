@@ -2,7 +2,7 @@ package com.github.seecret1.bank_card_management_system.controller;
 
 import com.github.seecret1.bank_card_management_system.dto.JwtAuthenticationDto;
 import com.github.seecret1.bank_card_management_system.dto.request.RefreshTokenRequest;
-import com.github.seecret1.bank_card_management_system.dto.request.UserCredentialsRequest;
+import com.github.seecret1.bank_card_management_system.dto.request.SignInByEmailRequest;
 import com.github.seecret1.bank_card_management_system.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class AuthController {
 
     @PostMapping("/sing-in")
     public ResponseEntity<JwtAuthenticationDto> singIn(
-            @RequestBody UserCredentialsRequest request
+            @RequestBody SignInByEmailRequest request
     ) {
         return ResponseEntity.ok(authService.singIn(request));
     }

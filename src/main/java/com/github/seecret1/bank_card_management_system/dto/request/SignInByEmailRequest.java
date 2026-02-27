@@ -8,13 +8,13 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class AuthenticationByEmailRequest {
+public class SignInByEmailRequest {
 
     @NotBlank(message = "Email must be set!")
     @Email(message = "Invalid email address")
     private String email;
 
     @NotBlank(message = "Password must be set!")
-    @Size(min = 8, max = 50, message = "Size of password must start from {min} and to {max}")
+    @Size(min = 8, message = "Size of password must start from {min}")
     private String password;
 }

@@ -2,7 +2,7 @@ package com.github.seecret1.bank_card_management_system.service.impl;
 
 import com.github.seecret1.bank_card_management_system.dto.JwtAuthenticationDto;
 import com.github.seecret1.bank_card_management_system.dto.request.RefreshTokenRequest;
-import com.github.seecret1.bank_card_management_system.dto.request.UserCredentialsRequest;
+import com.github.seecret1.bank_card_management_system.dto.request.SignInByEmailRequest;
 import com.github.seecret1.bank_card_management_system.entity.User;
 import com.github.seecret1.bank_card_management_system.repository.UserRepository;
 import com.github.seecret1.bank_card_management_system.security.jwt.JwtService;
@@ -29,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public JwtAuthenticationDto singIn(UserCredentialsRequest credentialsRequest) {
+    public JwtAuthenticationDto singIn(SignInByEmailRequest credentialsRequest) {
         User user = findByCredentials(credentialsRequest);
         log.info("Sing in user: {}", user);
         return jwtService.generateAuthToken(user.getEmail());
@@ -47,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
         return null;
     }
 
-    private User findByCredentials(UserCredentialsRequest credentialsRequest) {
+    private User findByCredentials(SignInByEmailRequest credentialsRequest) {
         Optional<User> optionalUser = userRepository.findByEmail(credentialsRequest.getEmail());
 
         if (optionalUser.isPresent()) {
