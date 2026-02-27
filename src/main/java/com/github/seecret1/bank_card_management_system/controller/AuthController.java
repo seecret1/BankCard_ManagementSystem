@@ -3,6 +3,8 @@ package com.github.seecret1.bank_card_management_system.controller;
 import com.github.seecret1.bank_card_management_system.dto.JwtAuthenticationDto;
 import com.github.seecret1.bank_card_management_system.dto.request.RefreshTokenRequest;
 import com.github.seecret1.bank_card_management_system.dto.request.SignInByEmailRequest;
+import com.github.seecret1.bank_card_management_system.dto.request.SignInByUsernameRequest;
+import com.github.seecret1.bank_card_management_system.dto.request.SignUpRequest;
 import com.github.seecret1.bank_card_management_system.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +20,25 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/sing-in")
-    public ResponseEntity<JwtAuthenticationDto> singIn(
+    @PostMapping("/sing-in/email")
+    public ResponseEntity<JwtAuthenticationDto> singInByEmail(
             @RequestBody SignInByEmailRequest request
     ) {
         return ResponseEntity.ok(authService.singIn(request));
+    }
+
+    @PostMapping("/sing-in/username")
+    public ResponseEntity<JwtAuthenticationDto> singInByUsername(
+            @RequestBody SignInByUsernameRequest request
+    ) {
+        return ResponseEntity.ok(authService.singIn(request));
+    }
+
+    @PostMapping("/sign-up")
+    public ResponseEntity<JwtAuthenticationDto> signUp(
+            @RequestBody SignUpRequest request
+    ) {
+        return ResponseEntity.ok(authService.singUp(request));
     }
 
     @PostMapping("/refresh")

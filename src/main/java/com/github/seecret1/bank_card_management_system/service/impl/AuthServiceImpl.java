@@ -1,16 +1,16 @@
 package com.github.seecret1.bank_card_management_system.service.impl;
 
 import com.github.seecret1.bank_card_management_system.dto.JwtAuthenticationDto;
-import com.github.seecret1.bank_card_management_system.dto.request.RefreshTokenRequest;
-import com.github.seecret1.bank_card_management_system.dto.request.SignInByEmailRequest;
+import com.github.seecret1.bank_card_management_system.dto.request.*;
 import com.github.seecret1.bank_card_management_system.entity.User;
+import com.github.seecret1.bank_card_management_system.entity.enums.RoleType;
+import com.github.seecret1.bank_card_management_system.exception.AuthException;
 import com.github.seecret1.bank_card_management_system.repository.UserRepository;
 import com.github.seecret1.bank_card_management_system.security.jwt.JwtService;
 import com.github.seecret1.bank_card_management_system.service.AuthService;
 import com.github.seecret1.bank_card_management_system.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +29,29 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public JwtAuthenticationDto singIn(SignInByEmailRequest credentialsRequest) {
-        User user = findByCredentials(credentialsRequest);
-        log.info("Sing in user: {}", user);
-        return jwtService.generateAuthToken(user.getEmail());
+    public JwtAuthenticationDto singIn(SignInByEmailRequest request) {
+        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+        return getJwtAuthenticationDto(optionalUser, request.getPassword());
+    }
+
+    @Override
+    public JwtAuthenticationDto singIn(SignInByUsernameRequest request) {
+        Optional<User> optionalUser = userRepository.findByEmail(request.getUsername());
+        return getJwtAuthenticationDto(optionalUser, request.getPassword());
+    }
+
+    @Override
+    public JwtAuthenticationDto singUp(SignUpRequest request) {
+        CreateUserRequest userRequest = new CreateUserRequest();
+        String email = request.getEmail();
+
+        userRequest.setUsername(request.getUsername());
+        userRequest.setEmail(email);
+        userRequest.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRequest.setRole(RoleType.ROLE_USER);
+
+        userService.create(userRequest);
+        return jwtService.generateAuthToken(email);
     }
 
     public JwtAuthenticationDto refreshToken(RefreshTokenRequest refreshTokenRequest) {
@@ -47,15 +66,13 @@ public class AuthServiceImpl implements AuthService {
         return null;
     }
 
-    private User findByCredentials(SignInByEmailRequest credentialsRequest) {
-        Optional<User> optionalUser = userRepository.findByEmail(credentialsRequest.getEmail());
-
+    private JwtAuthenticationDto getJwtAuthenticationDto(Optional<User> optionalUser, String password) {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            if (passwordEncoder.matches(credentialsRequest.getPassword(), user.getPassword())) {
-                return user;
+            if (passwordEncoder.matches(password, user.getPassword())) {
+                return jwtService.generateAuthToken(user.getEmail());
             }
         }
-        throw new AuthenticationCredentialsNotFoundException("Invalid email or password");
+        throw new AuthException("Invalid email or password");
     }
 }
