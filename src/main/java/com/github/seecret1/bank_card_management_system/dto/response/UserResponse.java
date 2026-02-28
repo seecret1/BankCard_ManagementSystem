@@ -1,6 +1,5 @@
 package com.github.seecret1.bank_card_management_system.dto.response;
 
-import com.github.seecret1.bank_card_management_system.dto.CardDto;
 import com.github.seecret1.bank_card_management_system.entity.enums.RoleType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,5 +31,5 @@ public class UserResponse {
 
     private RoleType role;
 
-    private Set<CardDto> cards;
+    private Set<CardResponse> cards;
 }

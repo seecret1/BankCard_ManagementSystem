@@ -3,8 +3,8 @@ package com.github.seecret1.bank_card_management_system.service.impl;
 import com.github.seecret1.bank_card_management_system.dto.JwtAuthenticationDto;
 import com.github.seecret1.bank_card_management_system.dto.request.*;
 import com.github.seecret1.bank_card_management_system.entity.User;
-import com.github.seecret1.bank_card_management_system.entity.enums.RoleType;
 import com.github.seecret1.bank_card_management_system.exception.AuthException;
+import com.github.seecret1.bank_card_management_system.exception.UserNotFoundException;
 import com.github.seecret1.bank_card_management_system.repository.UserRepository;
 import com.github.seecret1.bank_card_management_system.security.jwt.JwtService;
 import com.github.seecret1.bank_card_management_system.service.AuthService;
@@ -13,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -29,29 +27,36 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
+    @Override
     public JwtAuthenticationDto singIn(SignInByEmailRequest request) {
-        Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
-        return getJwtAuthenticationDto(optionalUser, request.getPassword());
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User not found by email: " + request.getEmail()
+                ));
+        if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return jwtService.generateAuthToken(user.getEmail());
+        }
+        throw new AuthException("Invalid email or password");
     }
 
     @Override
     public JwtAuthenticationDto singIn(SignInByUsernameRequest request) {
-        Optional<User> optionalUser = userRepository.findByEmail(request.getUsername());
-        return getJwtAuthenticationDto(optionalUser, request.getPassword());
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User not found by username: " + request.getUsername()
+                ));
+        if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return jwtService.generateAuthToken(user.getEmail());
+        }
+        throw new AuthException("Invalid username or password");
     }
 
     @Override
-    public JwtAuthenticationDto singUp(SignUpRequest request) {
-        CreateUserRequest userRequest = new CreateUserRequest();
-        String email = request.getEmail();
-
-        userRequest.setUsername(request.getUsername());
-        userRequest.setEmail(email);
-        userRequest.setPassword(passwordEncoder.encode(request.getPassword()));
-        userRequest.setRole(RoleType.ROLE_USER);
-
-        userService.create(userRequest);
-        return jwtService.generateAuthToken(email);
+    public JwtAuthenticationDto singUp(CreateUserRequest request) {
+        String pass = request.getPassword();
+        request.setPassword(passwordEncoder.encode(pass));
+        userService.create(request);
+        return jwtService.generateAuthToken(request.getEmail());
     }
 
     public JwtAuthenticationDto refreshToken(RefreshTokenRequest refreshTokenRequest) {
@@ -64,15 +69,5 @@ public class AuthServiceImpl implements AuthService {
         }
         log.error("Invalid refresh token");
         return null;
-    }
-
-    private JwtAuthenticationDto getJwtAuthenticationDto(Optional<User> optionalUser, String password) {
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            if (passwordEncoder.matches(password, user.getPassword())) {
-                return jwtService.generateAuthToken(user.getEmail());
-            }
-        }
-        throw new AuthException("Invalid email or password");
     }
 }
