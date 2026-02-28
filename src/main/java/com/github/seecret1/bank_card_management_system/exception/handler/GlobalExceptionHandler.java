@@ -89,6 +89,22 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, errors.toString());
     }
 
+    @ExceptionHandler(CardStatusException.class)
+    public ResponseEntity<ErrorResponse> handleCardStatusException(
+            CardStatusException ex
+    ) {
+        log.error("GlobalRestControllerAdvice -> CardStatusException: " + ex);
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidTransferException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTransferException(
+            InvalidTransferException ex
+    ) {
+        log.error("GlobalRestControllerAdvice -> InvalidTransferException: " + ex);
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     private ResponseEntity<ErrorResponse> buildResponse(
             HttpStatus status,
             String message
