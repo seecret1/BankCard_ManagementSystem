@@ -36,4 +36,20 @@ public class Card {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public Card(
+            String number,
+            LocalDate dateActivation,
+            LocalDate dateExpiry,
+            CardStatus status,
+            BigDecimal balance,
+            User user
+    ) {
+        this.number = number;
+        this.dateActivation = dateActivation;
+        this.dateExpiry = dateExpiry;
+        this.status = status;
+        this.balance = balance;
+        this.user = user;
+    }
 }
