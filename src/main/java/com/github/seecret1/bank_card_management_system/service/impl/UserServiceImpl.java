@@ -31,6 +31,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findAll();
 
         log.debug("Users list: {}, size list: {}", users, users.size());
+        log.info("Success found users list");
         return userMapper.toListResponse(users);
     }
 
@@ -42,6 +43,7 @@ public class UserServiceImpl implements UserService {
                         "User not found with id: " + id
                 ));
         log.debug("Found by id user: {}", user);
+        log.info("Successfully found user by id");
         return userMapper.toResponse(user);
     }
 
@@ -53,6 +55,7 @@ public class UserServiceImpl implements UserService {
                         "User not found with username: " + username
                 ));
         log.debug("Found by username user: {}", user);
+        log.info("Successfully found user by username");
         return userMapper.toResponse(user);
     }
 
@@ -64,6 +67,7 @@ public class UserServiceImpl implements UserService {
                         "User not found with email: " + email
                 ));
         log.debug("Found by email user: {}", user);
+        log.info("Successfully found user by email");
         return userMapper.toResponse(user);
     }
 
@@ -85,6 +89,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.save(userMapper.toEntity(request));
         log.debug("Success create user: {}", user);
+        log.info("Successfully created user");
         return userMapper.toResponse(user);
     }
 
@@ -97,6 +102,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userToUpdate);
 
         log.debug("Success full update user: {}", userToUpdate);
+        log.info("Successfully updated full user");
         return userMapper.toResponse(userToUpdate);
     }
 
@@ -120,6 +126,7 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.save(userUpdate);
         log.debug("Success update user: {}", userUpdate);
+        log.info("Successfully updated user");
         return userMapper.toResponse(userUpdate);
     }
 
@@ -127,6 +134,6 @@ public class UserServiceImpl implements UserService {
     public void delete(String id) {
         log.info("Delete user by ID: {}", id);
         userRepository.deleteById(id);
-        log.debug("Success delete user by ID: {}", id);
+        log.info("Success delete user by id");
     }
 }
