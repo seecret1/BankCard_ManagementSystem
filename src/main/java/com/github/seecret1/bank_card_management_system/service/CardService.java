@@ -12,7 +12,11 @@ public interface CardService {
 
     List<CardResponse> findAll();
 
+    CardResponse findById(String id);
+
     CardResponse findByNumber(String number);
+
+    List<CardResponse> findCardsUser(String userId);
 
     CardResponse create(CardRequest request, String userEmail);
 

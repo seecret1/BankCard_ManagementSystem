@@ -4,8 +4,10 @@ import com.github.seecret1.bank_card_management_system.entity.Card;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface CardRepository extends JpaRepository<Card, String> {
 
-    Card findByNumber(String number);
+    Optional<Card> findByNumber(String number);
 }

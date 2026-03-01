@@ -6,6 +6,7 @@ import com.github.seecret1.bank_card_management_system.dto.request.UpdateStatusC
 import com.github.seecret1.bank_card_management_system.dto.response.CardResponse;
 import com.github.seecret1.bank_card_management_system.entity.Card;
 import com.github.seecret1.bank_card_management_system.entity.enums.CardStatus;
+import com.github.seecret1.bank_card_management_system.exception.CardNotFoundException;
 import com.github.seecret1.bank_card_management_system.exception.CardStatusException;
 import com.github.seecret1.bank_card_management_system.exception.InvalidTransferException;
 import com.github.seecret1.bank_card_management_system.exception.UserNotFoundException;
@@ -42,11 +43,37 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
+    public CardResponse findById(String id) {
+        log.info("Find card by ID: {}", id);
+        var card = cardRepository.findById(id)
+                .orElseThrow(() -> new CardNotFoundException(
+                        "Card not found by id: " + id
+                ));
+        log.debug("Card: {}", card);
+        return cardMapper.toDto(card);
+    }
+
+    @Override
     public CardResponse findByNumber(String number) {
         log.info("Find card by number: {}", number);
-        var card = cardRepository.findByNumber(number);
+        var card = cardRepository.findByNumber(number)
+                .orElseThrow(() -> new CardNotFoundException(
+                        "Card not found by number: " + number
+                ));
         log.debug("Find by number card: {}", card.toString());
         return cardMapper.toDto(card);
+    }
+
+    @Override
+    public List<CardResponse> findCardsUser(String userId) {
+        log.info("Find cards by user: {}", userId);
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User not found by id: " + userId
+                ));
+        var listCards = user.getCards();
+        log.debug("List cards: {}, user: {}", listCards, user);
+        return cardMapper.toDtoList(listCards.stream().toList());
     }
 
     @Override
@@ -66,7 +93,10 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public CardResponse updateStatus(UpdateStatusCardRequest request) {
         log.info("Update status for card: {}", request.getNumber());
-        var card = cardRepository.findByNumber(request.getNumber());
+        var card = cardRepository.findByNumber(request.getNumber())
+                .orElseThrow(() -> new CardNotFoundException(
+                        "Card not found by id: " + request.getNumber()
+                ));
 
         CardStatus status = request.getStatus();
         if (status == CardStatus.ACTIVE &&
@@ -88,8 +118,16 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public List<CardResponse> transferMoney(TransferMoneyRequest request) {
         log.info("Transfer money cards");
-        var cardFrom = cardRepository.findByNumber(request.getNumberFrom());
-        var cardTo = cardRepository.findByNumber(request.getNumberTo());
+        String numberFrom = request.getNumberFrom();
+        String numberTo = request.getNumberTo();
+        var cardFrom = cardRepository.findByNumber(numberFrom)
+                .orElseThrow(() -> new CardNotFoundException(
+                        "Card not found by number: " + numberFrom
+                ));
+        var cardTo = cardRepository.findByNumber(numberTo)
+                .orElseThrow(() -> new CardNotFoundException(
+                        "Card not found by number: " + numberTo
+                ));
 
         if (cardFrom.getStatus() != CardStatus.ACTIVE &&
                 cardTo.getStatus() != CardStatus.ACTIVE) {
