@@ -2,7 +2,11 @@ package com.github.seecret1.bank_card_management_system.service;
 
 import com.github.seecret1.bank_card_management_system.dto.request.CreateUserRequest;
 import com.github.seecret1.bank_card_management_system.dto.request.UpdateUserRequest;
+import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.UserResponse;
+import com.github.seecret1.bank_card_management_system.model.UserFilterModel;
+import com.github.seecret1.bank_card_management_system.model.UserSearchModel;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -10,17 +14,17 @@ public interface UserService {
 
     List<UserResponse> findAllUsers();
 
-    UserResponse findById(String id);
+    PageResponse<UserResponse> findByFilter(UserFilterModel filter);
 
-    UserResponse findByUsername(String username);
+    UserResponse findBySearchModel(UserSearchModel searchModel);
 
-    UserResponse findByEmail(String email);
+    UserResponse findByCriterial(String criterial);
 
     UserResponse create(CreateUserRequest request);
 
-    UserResponse updateFull(String id, CreateUserRequest request);
+    UserResponse updateFull(String criterial, CreateUserRequest request);
 
-    UserResponse update(String id, UpdateUserRequest request);
+    UserResponse update(String criterial, UpdateUserRequest request);
 
-    void delete(String id);
+    void delete(String criterial);
 }

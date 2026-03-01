@@ -2,15 +2,20 @@ package com.github.seecret1.bank_card_management_system.service.impl;
 
 import com.github.seecret1.bank_card_management_system.dto.request.CreateUserRequest;
 import com.github.seecret1.bank_card_management_system.dto.request.UpdateUserRequest;
+import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.UserResponse;
 import com.github.seecret1.bank_card_management_system.entity.User;
 import com.github.seecret1.bank_card_management_system.exception.RegisterUserException;
 import com.github.seecret1.bank_card_management_system.exception.UserNotFoundException;
 import com.github.seecret1.bank_card_management_system.mapper.UserMapper;
+import com.github.seecret1.bank_card_management_system.model.UserFilterModel;
+import com.github.seecret1.bank_card_management_system.model.UserSearchModel;
 import com.github.seecret1.bank_card_management_system.repository.UserRepository;
+import com.github.seecret1.bank_card_management_system.repository.specification.UserSpecification;
 import com.github.seecret1.bank_card_management_system.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -31,43 +36,44 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findAll();
 
         log.debug("Users list: {}, size list: {}", users, users.size());
-        log.info("Success found users list");
         return userMapper.toListResponse(users);
     }
 
     @Override
-    public UserResponse findById(String id) {
-        log.info("Find user by ID: {}", id);
-        User user = userRepository.findById(id)
+    public PageResponse<UserResponse> findByFilter(UserFilterModel filter) {
+        log.info("Find users by filter: {}", filter);
+
+        var page = userRepository.findAll(
+                UserSpecification.withFilter(filter),
+                filter.getPage().toPageRequest()
+        );
+        log.debug("Find page by filter, Page: {}", page);
+        return new PageResponse<>(
+                page.getTotalElements(),
+                page.getTotalPages(),
+                userMapper.toListResponse(page.getContent()));
+    }
+
+    @Override
+    public UserResponse findByCriterial(String criterial) {
+        log.info("Find user by criterial: {}", criterial);
+        User user = userRepository.findByCriterial(criterial)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "User not found with id: " + id
+                        "User not found by criterial: " + criterial
                 ));
         log.debug("Found by id user: {}", user);
-        log.info("Successfully found user by id");
         return userMapper.toResponse(user);
     }
 
     @Override
-    public UserResponse findByUsername(String username) {
-        log.info("Find user by username: {}", username);
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "User not found with username: " + username
-                ));
-        log.debug("Found by username user: {}", user);
-        log.info("Successfully found user by username");
-        return userMapper.toResponse(user);
-    }
+    public UserResponse findBySearchModel(UserSearchModel searchModel) {
+        log.info("Find user by search model: {}", searchModel);
 
-    @Override
-    public UserResponse findByEmail(String email) {
-        log.info("Call method findUserByEmail");
-        User user = userRepository.findByEmail(email)
+        var user = userRepository.searchByModel(searchModel)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "User not found with email: " + email
+                        "User not found by search model: " + searchModel
                 ));
-        log.debug("Found by email user: {}", user);
-        log.info("Successfully found user by email");
+        log.debug("Found user by searchModel. User: {}", user);
         return userMapper.toResponse(user);
     }
 
@@ -89,7 +95,6 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.save(userMapper.toEntity(request));
         log.debug("Success create user: {}", user);
-        log.info("Successfully created user");
         return userMapper.toResponse(user);
     }
 
@@ -102,17 +107,16 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userToUpdate);
 
         log.debug("Success full update user: {}", userToUpdate);
-        log.info("Successfully updated full user");
         return userMapper.toResponse(userToUpdate);
     }
 
     @Override
-    public UserResponse update(String id, UpdateUserRequest request) {
-        log.info("Update user by ID: {}", id);
+    public UserResponse update(String criterial, UpdateUserRequest request) {
+        log.info("Update user by criterial: {}", criterial);
 
-        var userUpdate = userRepository.findById(id)
+        var userUpdate = userRepository.findByCriterial(criterial)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "User not found with id: " + id
+                        "User not found with criterial: " + criterial
                 ));
 
         if (request.getUsername() != null && !request.getUsername().isBlank()) {
@@ -126,14 +130,12 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.save(userUpdate);
         log.debug("Success update user: {}", userUpdate);
-        log.info("Successfully updated user");
         return userMapper.toResponse(userUpdate);
     }
 
     @Override
-    public void delete(String id) {
-        log.info("Delete user by ID: {}", id);
-        userRepository.deleteById(id);
-        log.info("Success delete user by id");
+    public void delete(String criterial) {
+        log.info("Delete user by criterial: {}", criterial);
+        userRepository.delete(UserSpecification.searchByCriterial(criterial));
     }
 }
