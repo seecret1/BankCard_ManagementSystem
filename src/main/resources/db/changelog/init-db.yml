@@ -66,7 +66,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: number
-                  type: VARCHAR(11)
+                  type: VARCHAR(16)
                   constraints:
                     nullable: false
                     unique: true
