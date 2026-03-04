@@ -19,6 +19,6 @@ spring:
 
 user-service:
   jwt:
-    secret: MyVeryLongAndSecureSecretKeyForJWTTokenSigningThatIsAtLeast64CharactersLongToMeetHS512Requirements123456789
+    secret: ${SECRET_KEY}
     tokenExpiration: 1m
     refreshTokenExpiration: 30m

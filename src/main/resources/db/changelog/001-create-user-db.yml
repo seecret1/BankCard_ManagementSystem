@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: create_users_cards_tables
+      id: create_users_table
       author: seecret1
       changes:
         - createTable:
@@ -54,52 +54,3 @@ databaseChangeLog:
                   type: VARCHAR(15)
                   constraints:
                     nullable: false
-
-        - createTable:
-            tableName: cards
-            columns:
-              - column:
-                  name: id
-                  type: VARCHAR
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: number
-                  type: VARCHAR(16)
-                  constraints:
-                    nullable: false
-                    unique: true
-              - column:
-                  name: date_activation
-                  type: date
-                  constraints:
-                    nullable: false
-              - column:
-                  name: date_expiry
-                  type: date
-                  constraints:
-                    nullable: false
-              - column:
-                  name: status
-                  type: VARCHAR(12)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: balance
-                  type: DECIMAL(10,2)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: user_id
-                  type: VARCHAR
-                  constraints:
-                    nullable: false
-
-        - addForeignKeyConstraint:
-            constraintName: fk_card_owner
-            baseTableName: cards
-            baseColumnNames: user_id
-            referencedTableName: users
-            referencedColumnNames: id
-            onDelete: CASCADE
