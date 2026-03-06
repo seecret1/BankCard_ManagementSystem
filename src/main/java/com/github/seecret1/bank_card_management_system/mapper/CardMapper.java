@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.List;
 
 @Component
-public class CardMapper {
+public final class CardMapper {
 
     public Set<CardResponse> toDtoList(Set<Card> cards, UserInfoResponse userInfo) {
         Set<CardResponse> dtoList = new HashSet<>(cards.size());

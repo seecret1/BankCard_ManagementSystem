@@ -14,7 +14,7 @@ import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class UserMapper {
+public final class UserMapper {
 
     private final CardMapper cardMapper;
 
