@@ -4,6 +4,7 @@ import com.github.seecret1.bank_card_management_system.dto.request.CardRequest;
 import com.github.seecret1.bank_card_management_system.dto.request.TransferMoneyRequest;
 import com.github.seecret1.bank_card_management_system.dto.request.UpdateStatusCardRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.CardResponse;
+import com.github.seecret1.bank_card_management_system.dto.response.CardSummaryResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
 import com.github.seecret1.bank_card_management_system.entity.Card;
 import com.github.seecret1.bank_card_management_system.entity.enums.CardStatus;
@@ -42,7 +43,7 @@ public class CardServiceImpl implements CardService {
         log.info("Find all cards");
         List<Card> cards = cardRepository.findAll();
         log.debug("Cards list: {}", cards);
-        return cardMapper.toResponseList(cards);
+        return cardMapper.toDtoResponseList(cards);
     }
 
     @Override
@@ -56,7 +57,7 @@ public class CardServiceImpl implements CardService {
         return new PageResponse<>(
                 page.getTotalElements(),
                 page.getTotalPages(),
-                cardMapper.toResponseList(page.getContent())
+                cardMapper.toDtoResponseList(page.getContent())
         );
     }
 
@@ -68,7 +69,7 @@ public class CardServiceImpl implements CardService {
                         "Card not found by criterial: " + criterial
                 ));
         log.debug("Find by criterial card: {}", card.toString());
-        return cardMapper.toResponse(card);
+        return cardMapper.toDtoResponse(card);
     }
 
     @Override
@@ -80,7 +81,7 @@ public class CardServiceImpl implements CardService {
                 ));
         var listCards = user.getCards();
         log.debug("List cards: {}, user: {}", listCards, user);
-        return cardMapper.toResponseList(listCards.stream().toList());
+        return cardMapper.toDtoResponseList(listCards.stream().toList());
     }
 
     @Override
@@ -93,7 +94,7 @@ public class CardServiceImpl implements CardService {
         var card = cardRepository.save(cardMapper.toEntity(request, user));
         log.debug("Created card: {}", card);
         log.info("Create card successful");
-        return cardMapper.toResponse(card);
+        return cardMapper.toDtoResponse(card);
     }
 
     @Override
@@ -117,12 +118,12 @@ public class CardServiceImpl implements CardService {
         log.debug("Update card status: {}", card);
         cardRepository.save(card);
         log.info("Update card successful");
-        return cardMapper.toResponse(card);
+        return cardMapper.toDtoResponse(card);
     }
 
     @Override
     @Transactional
-    public List<CardResponse> transferMoney(TransferMoneyRequest request) {
+    public List<CardSummaryResponse> transferMoney(TransferMoneyRequest request) {
         log.info("Transfer money cards");
         String numberFrom = request.getNumberFrom();
         String numberTo = request.getNumberTo();

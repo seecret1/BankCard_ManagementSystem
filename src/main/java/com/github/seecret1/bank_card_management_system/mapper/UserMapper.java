@@ -46,7 +46,7 @@ public final class UserMapper {
         response.setMiddleName(middleName);
         response.setBirthDate(birthDate);
         response.setRole(role);
-        response.setCards(cardMapper.toResponseList(user.getCards(), userInfo));
+        response.setCards(cardMapper.toResponseList(user.getCards()));
 
         return response;
     }

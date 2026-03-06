@@ -3,6 +3,7 @@ package com.github.seecret1.bank_card_management_system.controller;
 import com.github.seecret1.bank_card_management_system.dto.request.CardRequest;
 import com.github.seecret1.bank_card_management_system.dto.request.TransferMoneyRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.CardResponse;
+import com.github.seecret1.bank_card_management_system.dto.response.CardSummaryResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
 import com.github.seecret1.bank_card_management_system.model.CardFilterModel;
 import com.github.seecret1.bank_card_management_system.service.CardService;
@@ -56,11 +57,11 @@ public class CardController {
             @Valid @RequestBody CardRequest cardRequest
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(cardService.create(cardRequest, cardRequest.getUser().getEmail()));
+                .body(cardService.create(cardRequest, cardRequest.getUserCriterial()));
     }
 
     @PostMapping("/transfer")
-    public ResponseEntity<List<CardResponse>> transferMoney(
+    public ResponseEntity<List<CardSummaryResponse>> transferMoney(
             @Valid @RequestBody TransferMoneyRequest request
     ) {
         return ResponseEntity.ok(cardService.transferMoney(request));

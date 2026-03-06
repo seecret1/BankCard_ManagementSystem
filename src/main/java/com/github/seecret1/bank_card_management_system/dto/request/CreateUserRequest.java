@@ -38,6 +38,7 @@ public class CreateUserRequest {
 
     private String middleName;
 
+    @NotNull(message = "birth date must be set!")
     private LocalDate birthDate;
 
     @NotNull

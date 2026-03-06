@@ -20,5 +20,5 @@ spring:
 user-service:
   jwt:
     secret: ${SECRET_KEY}
-    tokenExpiration: 1m
+    tokenExpiration: 5m
     refreshTokenExpiration: 30m

@@ -2,7 +2,7 @@ package com.github.seecret1.bank_card_management_system.mapper;
 
 import com.github.seecret1.bank_card_management_system.dto.request.CardRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.CardResponse;
-import com.github.seecret1.bank_card_management_system.dto.response.UserInfoResponse;
+import com.github.seecret1.bank_card_management_system.dto.response.CardSummaryResponse;
 import com.github.seecret1.bank_card_management_system.entity.Card;
 import com.github.seecret1.bank_card_management_system.entity.User;
 import com.github.seecret1.bank_card_management_system.entity.enums.CardStatus;
@@ -16,18 +16,18 @@ import java.util.List;
 @Component
 public final class CardMapper {
 
-    public Set<CardResponse> toResponseList(Set<Card> cards, UserInfoResponse userInfo) {
-        Set<CardResponse> dtoList = new HashSet<>(cards.size());
+    public List<CardResponse> toDtoResponseList(List<Card> cards) {
+        List<CardResponse> dtoList = new ArrayList<>(cards.size());
 
         for (var card : cards) {
-            dtoList.add(toResponse(card, userInfo));
+            dtoList.add(toDtoResponse(card));
         }
 
         return dtoList;
     }
 
-    public List<CardResponse> toResponseList(List<Card> cards) {
-        List<CardResponse> dtoList = new ArrayList<>(cards.size());
+    public Set<CardSummaryResponse> toResponseList(Set<Card> cards) {
+        Set<CardSummaryResponse> dtoList = new HashSet<>(cards.size());
 
         for (var card : cards) {
             dtoList.add(toResponse(card));
@@ -36,25 +36,22 @@ public final class CardMapper {
         return dtoList;
     }
 
-    public CardResponse toResponse(Card card, UserInfoResponse userInfo) {
+    public CardResponse toDtoResponse(Card card) {
         CardResponse dto = new CardResponse();
         dto.setNumber(card.getNumber());
         dto.setDateActivation(card.getDateActivation());
         dto.setDateExpiry(card.getDateExpiry());
         dto.setStatus(card.getStatus());
-        dto.setBalance(card.getBalance());
-        dto.setUser(userInfo);
 
         return dto;
     }
 
-    public CardResponse toResponse(Card card) {
-        CardResponse dto = new CardResponse();
+    public CardSummaryResponse toResponse(Card card) {
+        CardSummaryResponse dto = new CardSummaryResponse();
         dto.setNumber(card.getNumber());
-        dto.setDateActivation(card.getDateActivation());
-        dto.setDateExpiry(card.getDateExpiry());
         dto.setStatus(card.getStatus());
         dto.setBalance(card.getBalance());
+
         return dto;
     }
 

@@ -19,8 +19,6 @@ public class UserResponse {
 
     private String email;
 
-    private String password;
-
     private String firstName;
 
     private String lastName;
@@ -31,5 +29,5 @@ public class UserResponse {
 
     private RoleType role;
 
-    private Set<CardResponse> cards;
+    private Set<CardSummaryResponse> cards;
 }
