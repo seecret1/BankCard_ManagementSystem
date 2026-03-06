@@ -34,8 +34,9 @@ public class User {
 
     private LocalDate birthDate;
 
+    @Enumerated(EnumType.STRING)
     private RoleType role;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Card> cards = new HashSet<>();
 }
