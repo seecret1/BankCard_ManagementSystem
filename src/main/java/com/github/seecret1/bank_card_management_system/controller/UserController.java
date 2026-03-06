@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
-@Validated
 public class UserController {
 
     private final UserService userService;
