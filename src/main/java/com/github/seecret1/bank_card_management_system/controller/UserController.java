@@ -5,7 +5,6 @@ import com.github.seecret1.bank_card_management_system.dto.request.UpdateUserReq
 import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.UserResponse;
 import com.github.seecret1.bank_card_management_system.model.UserFilterModel;
-import com.github.seecret1.bank_card_management_system.model.UserSearchModel;
 import com.github.seecret1.bank_card_management_system.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,14 +35,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findByFilter(filter));
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<UserResponse> findBySearchModel(
-            @Valid @RequestBody UserSearchModel searchModel
-    ) {
-        return ResponseEntity.ok(userService.findBySearchModel(searchModel));
-    }
-
-    @GetMapping("/search/{criterial}")
+    @GetMapping("/{criterial}")
     public ResponseEntity<UserResponse> findByCriterial(
             @PathVariable String criterial
     ) {

@@ -9,7 +9,6 @@ import com.github.seecret1.bank_card_management_system.exception.RegisterUserExc
 import com.github.seecret1.bank_card_management_system.exception.UserNotFoundException;
 import com.github.seecret1.bank_card_management_system.mapper.UserMapper;
 import com.github.seecret1.bank_card_management_system.model.UserFilterModel;
-import com.github.seecret1.bank_card_management_system.model.UserSearchModel;
 import com.github.seecret1.bank_card_management_system.repository.UserRepository;
 import com.github.seecret1.bank_card_management_system.repository.specification.UserSpecification;
 import com.github.seecret1.bank_card_management_system.service.UserService;
@@ -73,18 +72,6 @@ public class UserServiceImpl implements UserService {
                         "User not found by email: " + email)
                 );
         log.debug("Found user by email. User: {}", user);
-        return userMapper.toResponse(user);
-    }
-
-    @Override
-    public UserResponse findBySearchModel(UserSearchModel searchModel) {
-        log.info("Find user by search model: {}", searchModel);
-
-        var user = userRepository.searchByModel(searchModel)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "User not found by search model: " + searchModel
-                ));
-        log.debug("Found user by searchModel. User: {}", user);
         return userMapper.toResponse(user);
     }
 
