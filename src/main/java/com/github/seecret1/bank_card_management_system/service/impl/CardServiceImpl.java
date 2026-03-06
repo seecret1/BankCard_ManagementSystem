@@ -72,11 +72,11 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public List<CardResponse> findCardsUser(String userId) {
-        log.info("Find cards by user: {}", userId);
-        var user = userRepository.findById(userId)
+    public List<CardResponse> findCardsUser(String userCriterial) {
+        log.info("Find cards by user: {}", userCriterial);
+        var user = userRepository.findByCriterial(userCriterial)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "User not found by id: " + userId
+                        "User not found by criterial: " + userCriterial
                 ));
         var listCards = user.getCards();
         log.debug("List cards: {}, user: {}", listCards, user);
@@ -164,17 +164,17 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public void delete(String number, String criterial) {
-        log.info("Delete card by number: {}", number);
-        var user = userRepository.findByCriterial(criterial)
+    public void delete(String cardCriterial, String userCriterial) {
+        log.info("Delete card by card criterial: {}", cardCriterial);
+        var user = userRepository.findByCriterial(userCriterial)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "User not found by email: " + criterial
+                        "User not found by criterial: " + userCriterial
                 ));
 
-        log.debug("Delete card by number: {}, and user email: {}",
-                number, criterial);
+        log.debug("Delete card by criterial: {}, and user by criterial: {}",
+                cardCriterial, userCriterial);
 
-        var card = findByCriterial(number);
+        var card = findByCriterial(cardCriterial);
         cardRepository.delete(cardMapper.toEntity(card, user));
         log.info("Delete card successful");
     }
