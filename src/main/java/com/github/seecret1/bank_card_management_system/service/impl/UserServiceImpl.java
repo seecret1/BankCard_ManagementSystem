@@ -15,7 +15,6 @@ import com.github.seecret1.bank_card_management_system.repository.specification.
 import com.github.seecret1.bank_card_management_system.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -62,7 +61,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException(
                         "User not found by criterial: " + criterial
                 ));
-        log.debug("Found by id user: {}", user);
+        log.debug("Found user by criterial. User: {}", user);
         return userMapper.toResponse(user);
     }
 
@@ -73,7 +72,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException(
                         "User not found by email: " + email)
                 );
-        log.debug("Found by id user: {}", user);
+        log.debug("Found user by email. User: {}", user);
         return userMapper.toResponse(user);
     }
 
