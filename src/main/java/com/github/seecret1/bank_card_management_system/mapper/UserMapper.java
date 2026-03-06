@@ -40,7 +40,6 @@ public final class UserMapper {
         response.setId(user.getId());
         response.setUsername(username);
         response.setEmail(email);
-        response.setPassword(user.getPassword());
         response.setFirstName(firstName);
         response.setLastName(lastName);
         response.setMiddleName(middleName);
