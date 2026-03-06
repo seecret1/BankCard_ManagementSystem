@@ -20,7 +20,7 @@ public interface CardService {
 
     List<CardResponse> findCardsUser(String userCriterial);
 
-    CardResponse create(CardRequest request, String userEmail);
+    CardResponse create(CardRequest request);
 
     CardResponse updateStatus(UpdateStatusCardRequest request);
 

@@ -3,6 +3,7 @@ package com.github.seecret1.bank_card_management_system.mapper;
 import com.github.seecret1.bank_card_management_system.dto.request.CardRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.CardResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.CardSummaryResponse;
+import com.github.seecret1.bank_card_management_system.dto.response.UserInfoResponse;
 import com.github.seecret1.bank_card_management_system.entity.Card;
 import com.github.seecret1.bank_card_management_system.entity.User;
 import com.github.seecret1.bank_card_management_system.entity.enums.CardStatus;
@@ -42,6 +43,21 @@ public final class CardMapper {
         dto.setDateActivation(card.getDateActivation());
         dto.setDateExpiry(card.getDateExpiry());
         dto.setStatus(card.getStatus());
+        dto.setBalance(card.getBalance());
+
+        if (card.getUser() != null) {
+            User user = card.getUser();
+            UserInfoResponse response = new UserInfoResponse();
+            response.setUsername(user.getUsername());
+            response.setEmail(user.getEmail());
+            response.setFirstName(user.getFirstName());
+            response.setLastName(user.getLastName());
+            response.setMiddleName(user.getMiddleName());
+            response.setBirthDate(user.getBirthDate());
+            response.setRole(user.getRole());
+
+            dto.setUser(response);
+        }
 
         return dto;
     }

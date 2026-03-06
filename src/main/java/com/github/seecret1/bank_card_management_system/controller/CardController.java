@@ -2,6 +2,7 @@ package com.github.seecret1.bank_card_management_system.controller;
 
 import com.github.seecret1.bank_card_management_system.dto.request.CardRequest;
 import com.github.seecret1.bank_card_management_system.dto.request.TransferMoneyRequest;
+import com.github.seecret1.bank_card_management_system.dto.request.UpdateStatusCardRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.CardResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.CardSummaryResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
@@ -33,7 +34,9 @@ public class CardController {
 
     @GetMapping("/filter")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<PageResponse<CardResponse>> findCardsByFilter(CardFilterModel filter) {
+    public ResponseEntity<PageResponse<CardResponse>> findCardsByFilter(
+            @Valid @RequestBody CardFilterModel filter
+    ) {
         return ResponseEntity.ok(cardService.findByFilter(filter));
     }
 
@@ -57,7 +60,15 @@ public class CardController {
             @Valid @RequestBody CardRequest cardRequest
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(cardService.create(cardRequest, cardRequest.getUserCriterial()));
+                .body(cardService.create(cardRequest));
+    }
+
+    @PutMapping("/update")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<CardResponse> updateCard(
+            @RequestBody UpdateStatusCardRequest request
+    ) {
+        return ResponseEntity.ok(cardService.updateStatus(request));
     }
 
     @PostMapping("/transfer")

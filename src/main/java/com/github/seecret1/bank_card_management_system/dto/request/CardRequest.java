@@ -1,8 +1,8 @@
 package com.github.seecret1.bank_card_management_system.dto.request;
 
-import com.github.seecret1.bank_card_management_system.dto.response.UserInfoResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -22,7 +22,7 @@ public class CardRequest {
     @NotNull(message = "Date expiry must be set!")
     private LocalDate dateExpiry;
 
-    @NotBlank(message = "Balance must be set!")
+    @PositiveOrZero
     private BigDecimal balance = BigDecimal.valueOf(0);
 
     @NotBlank(message = "User must be set!")

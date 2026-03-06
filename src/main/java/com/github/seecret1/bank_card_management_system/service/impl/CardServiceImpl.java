@@ -85,12 +85,14 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public CardResponse create(CardRequest request, String userEmail) {
-        log.info("Creating a user card, email {}", userEmail);
-        var user = userRepository.findByEmail(userEmail)
+    public CardResponse create(CardRequest request) {
+        String criterial = request.getUserCriterial();
+        log.info("Creating a user card, criterial: {}", criterial);
+        var user = userRepository.findByCriterial(criterial)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "User not found by email: " + userEmail
+                        "User not found by email: " + criterial
                 ));
+
         var card = cardRepository.save(cardMapper.toEntity(request, user));
         log.debug("Created card: {}", card);
         log.info("Create card successful");
