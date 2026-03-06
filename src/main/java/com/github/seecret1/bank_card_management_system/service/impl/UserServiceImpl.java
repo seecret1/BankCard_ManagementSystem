@@ -67,6 +67,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse findByEmail(String email) {
+        log.info("Find user by email: {}", email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User not found by email: " + email)
+                );
+        log.debug("Found by id user: {}", user);
+        return userMapper.toResponse(user);
+    }
+
+    @Override
     public UserResponse findBySearchModel(UserSearchModel searchModel) {
         log.info("Find user by search model: {}", searchModel);
 
