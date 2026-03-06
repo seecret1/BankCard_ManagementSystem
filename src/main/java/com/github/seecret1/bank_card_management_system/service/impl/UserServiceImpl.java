@@ -148,6 +148,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(String criterial) {
         log.info("Delete user by criterial: {}", criterial);
-        userRepository.delete(UserSpecification.searchByCriterial(criterial));
+        var user = userRepository.findByCriterial(criterial)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User not found by criterial: " + criterial
+                ));
+        log.debug("Success delete user: {}", user);
+        userRepository.delete(user);
     }
 }
