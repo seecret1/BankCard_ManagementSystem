@@ -16,27 +16,27 @@ import java.util.List;
 @Component
 public final class CardMapper {
 
-    public Set<CardResponse> toDtoList(Set<Card> cards, UserInfoResponse userInfo) {
+    public Set<CardResponse> toResponseList(Set<Card> cards, UserInfoResponse userInfo) {
         Set<CardResponse> dtoList = new HashSet<>(cards.size());
 
         for (var card : cards) {
-            dtoList.add(toDto(card, userInfo));
+            dtoList.add(toResponse(card, userInfo));
         }
 
         return dtoList;
     }
 
-    public List<CardResponse> toDtoList(List<Card> cards) {
+    public List<CardResponse> toResponseList(List<Card> cards) {
         List<CardResponse> dtoList = new ArrayList<>(cards.size());
 
         for (var card : cards) {
-            dtoList.add(toDto(card));
+            dtoList.add(toResponse(card));
         }
 
         return dtoList;
     }
 
-    public CardResponse toDto(Card card, UserInfoResponse userInfo) {
+    public CardResponse toResponse(Card card, UserInfoResponse userInfo) {
         CardResponse dto = new CardResponse();
         dto.setNumber(card.getNumber());
         dto.setDateActivation(card.getDateActivation());
@@ -48,7 +48,7 @@ public final class CardMapper {
         return dto;
     }
 
-    public CardResponse toDto(Card card) {
+    public CardResponse toResponse(Card card) {
         CardResponse dto = new CardResponse();
         dto.setNumber(card.getNumber());
         dto.setDateActivation(card.getDateActivation());

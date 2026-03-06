@@ -3,7 +3,6 @@ package com.github.seecret1.bank_card_management_system.mapper;
 import com.github.seecret1.bank_card_management_system.dto.request.CreateUserRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.UserInfoResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.UserResponse;
-import com.github.seecret1.bank_card_management_system.entity.Card;
 import com.github.seecret1.bank_card_management_system.entity.User;
 import com.github.seecret1.bank_card_management_system.entity.enums.RoleType;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +46,7 @@ public final class UserMapper {
         response.setMiddleName(middleName);
         response.setBirthDate(birthDate);
         response.setRole(role);
-        response.setCards(cardMapper.toDtoList(user.getCards(), userInfo));
+        response.setCards(cardMapper.toResponseList(user.getCards(), userInfo));
 
         return response;
     }
@@ -72,19 +71,5 @@ public final class UserMapper {
         user.setBirthDate(request.getBirthDate());
         user.setRole(request.getRole());
         return user;
-    }
-
-    private Card mappedToCard(String cardId) {
-        Card card = new Card();
-        card.setId(cardId);
-        return card;
-    }
-
-    private Set<Card> mappedToCards(Set<String> cardsId) {
-        Set<Card> cards = new HashSet<>();
-        for (String cardId : cardsId) {
-            cards.add(mappedToCard(cardId));
-        }
-        return cards;
     }
 }
