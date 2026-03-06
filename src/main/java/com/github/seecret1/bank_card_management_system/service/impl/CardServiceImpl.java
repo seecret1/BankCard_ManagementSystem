@@ -4,6 +4,7 @@ import com.github.seecret1.bank_card_management_system.dto.request.CardRequest;
 import com.github.seecret1.bank_card_management_system.dto.request.TransferMoneyRequest;
 import com.github.seecret1.bank_card_management_system.dto.request.UpdateStatusCardRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.CardResponse;
+import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
 import com.github.seecret1.bank_card_management_system.entity.Card;
 import com.github.seecret1.bank_card_management_system.entity.enums.CardStatus;
 import com.github.seecret1.bank_card_management_system.exception.CardNotFoundException;
@@ -11,8 +12,10 @@ import com.github.seecret1.bank_card_management_system.exception.CardStatusExcep
 import com.github.seecret1.bank_card_management_system.exception.InvalidTransferException;
 import com.github.seecret1.bank_card_management_system.exception.UserNotFoundException;
 import com.github.seecret1.bank_card_management_system.mapper.CardMapper;
+import com.github.seecret1.bank_card_management_system.model.CardFilterModel;
 import com.github.seecret1.bank_card_management_system.repository.CardRepository;
 import com.github.seecret1.bank_card_management_system.repository.UserRepository;
+import com.github.seecret1.bank_card_management_system.repository.specification.CardSpecification;
 import com.github.seecret1.bank_card_management_system.service.CardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,29 +42,33 @@ public class CardServiceImpl implements CardService {
         log.info("Find all cards");
         List<Card> cards = cardRepository.findAll();
         log.debug("Cards list: {}", cards);
-        return cardMapper.toDtoList(cards);
+        return cardMapper.toResponseList(cards);
     }
 
     @Override
-    public CardResponse findById(String id) {
-        log.info("Find card by ID: {}", id);
-        var card = cardRepository.findById(id)
-                .orElseThrow(() -> new CardNotFoundException(
-                        "Card not found by id: " + id
-                ));
-        log.debug("Card: {}", card);
-        return cardMapper.toDto(card);
+    public PageResponse<CardResponse> findByFilter(CardFilterModel filter) {
+        log.info("Find card by filter: {}", filter);
+        var page = cardRepository.findAll(
+                CardSpecification.withFilter(filter),
+                filter.getPage().toPageRequest()
+        );
+        log.debug("Find page cards by filter. Page: {}", page);
+        return new PageResponse<>(
+                page.getTotalElements(),
+                page.getTotalPages(),
+                cardMapper.toResponseList(page.getContent())
+        );
     }
 
     @Override
-    public CardResponse findByNumber(String number) {
-        log.info("Find card by number: {}", number);
-        var card = cardRepository.findByNumber(number)
+    public CardResponse findByCriterial(String criterial) {
+        log.info("Find card by criterial: {}", criterial);
+        var card = cardRepository.findByCriterial(criterial)
                 .orElseThrow(() -> new CardNotFoundException(
-                        "Card not found by number: " + number
+                        "Card not found by criterial: " + criterial
                 ));
-        log.debug("Find by number card: {}", card.toString());
-        return cardMapper.toDto(card);
+        log.debug("Find by criterial card: {}", card.toString());
+        return cardMapper.toResponse(card);
     }
 
     @Override
@@ -73,7 +80,7 @@ public class CardServiceImpl implements CardService {
                 ));
         var listCards = user.getCards();
         log.debug("List cards: {}, user: {}", listCards, user);
-        return cardMapper.toDtoList(listCards.stream().toList());
+        return cardMapper.toResponseList(listCards.stream().toList());
     }
 
     @Override
@@ -86,14 +93,13 @@ public class CardServiceImpl implements CardService {
         var card = cardRepository.save(cardMapper.toEntity(request, user));
         log.debug("Created card: {}", card);
         log.info("Create card successful");
-        return cardMapper.toDto(card);
+        return cardMapper.toResponse(card);
     }
 
     @Override
-    @Transactional
     public CardResponse updateStatus(UpdateStatusCardRequest request) {
         log.info("Update status for card: {}", request.getNumber());
-        var card = cardRepository.findByNumber(request.getNumber())
+        var card = cardRepository.findByCriterial(request.getNumber())
                 .orElseThrow(() -> new CardNotFoundException(
                         "Card not found by id: " + request.getNumber()
                 ));
@@ -111,7 +117,7 @@ public class CardServiceImpl implements CardService {
         log.debug("Update card status: {}", card);
         cardRepository.save(card);
         log.info("Update card successful");
-        return cardMapper.toDto(card);
+        return cardMapper.toResponse(card);
     }
 
     @Override
@@ -120,11 +126,11 @@ public class CardServiceImpl implements CardService {
         log.info("Transfer money cards");
         String numberFrom = request.getNumberFrom();
         String numberTo = request.getNumberTo();
-        var cardFrom = cardRepository.findByNumber(numberFrom)
+        var cardFrom = cardRepository.findByCriterial(numberFrom)
                 .orElseThrow(() -> new CardNotFoundException(
                         "Card not found by number: " + numberFrom
                 ));
-        var cardTo = cardRepository.findByNumber(numberTo)
+        var cardTo = cardRepository.findByCriterial(numberTo)
                 .orElseThrow(() -> new CardNotFoundException(
                         "Card not found by number: " + numberTo
                 ));
@@ -154,21 +160,21 @@ public class CardServiceImpl implements CardService {
         cardRepository.save(cardTo);
 
         log.info("Transfer card successful");
-        return List.of(cardMapper.toDto(cardFrom), cardMapper.toDto(cardTo));
+        return List.of(cardMapper.toResponse(cardFrom), cardMapper.toResponse(cardTo));
     }
 
     @Override
-    public void delete(String number, String userEmail) {
+    public void delete(String number, String criterial) {
         log.info("Delete card by number: {}", number);
-        var user = userRepository.findByEmail(userEmail)
+        var user = userRepository.findByCriterial(criterial)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "User not found by email: " + userEmail
+                        "User not found by email: " + criterial
                 ));
 
         log.debug("Delete card by number: {}, and user email: {}",
-                number, userEmail);
+                number, criterial);
 
-        var card = findByNumber(number);
+        var card = findByCriterial(number);
         cardRepository.delete(cardMapper.toEntity(card, user));
         log.info("Delete card successful");
     }

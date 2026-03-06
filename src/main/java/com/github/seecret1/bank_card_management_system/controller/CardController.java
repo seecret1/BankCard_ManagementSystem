@@ -1,7 +1,10 @@
 package com.github.seecret1.bank_card_management_system.controller;
 
 import com.github.seecret1.bank_card_management_system.dto.request.CardRequest;
+import com.github.seecret1.bank_card_management_system.dto.request.TransferMoneyRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.CardResponse;
+import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
+import com.github.seecret1.bank_card_management_system.model.CardFilterModel;
 import com.github.seecret1.bank_card_management_system.service.CardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,18 +27,24 @@ public class CardController {
         return ResponseEntity.ok(cardService.findAll());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CardResponse> findById(
-            @PathVariable String id
-    ) {
-        return ResponseEntity.ok(cardService.findById(id));
+    @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<PageResponse<CardResponse>> findCardsByFilter(CardFilterModel filter) {
+        return ResponseEntity.ok(cardService.findByFilter(filter));
     }
 
-    @GetMapping("/card-number/{number}")
-    public ResponseEntity<CardResponse> findCardByNumber(
-            @PathVariable String number
+    @GetMapping("/{criterial}")
+    public ResponseEntity<CardResponse> findByCriterial(
+            @PathVariable String criterial
     ) {
-        return ResponseEntity.ok(cardService.findByNumber(number));
+        return ResponseEntity.ok(cardService.findByCriterial(criterial));
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<CardResponse>> findCardsUser(
+            @PathVariable String userId
+    ) {
+        return ResponseEntity.ok(cardService.findCardsUser(userId));
     }
 
     @PostMapping("/create")
@@ -44,6 +53,23 @@ public class CardController {
             @RequestBody CardRequest cardRequest
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(cardService.create(cardRequest));
+                .body(cardService.create(cardRequest, cardRequest.getUser().getEmail()));
+    }
+
+    @PostMapping("/transfer")
+    public ResponseEntity<List<CardResponse>> transferMoney(
+            @RequestBody TransferMoneyRequest request
+    ) {
+        return ResponseEntity.ok(cardService.transferMoney(request));
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping("/delete/{number}/user/{criterial}")
+    public ResponseEntity<?> deleteCards(
+            @PathVariable String number,
+            @PathVariable String criterial
+    ) {
+        cardService.delete(number, criterial);
+        return ResponseEntity.noContent().build();
     }
 }
