@@ -117,13 +117,13 @@ public class UserServiceImpl implements UserService {
                         "User not found with criterial: " + criterial
                 ));
 
-        if (request.getUsername() != null && !request.getUsername().isBlank()) {
+        if (request.getUsername() != null) {
             userUpdate.setUsername(request.getUsername());
         }
-        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+        if (request.getEmail() != null) {
             userUpdate.setEmail(request.getEmail());
         }
-        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+        if (request.getPassword() != null) {
             userUpdate.setPassword(request.getPassword());
         }
         userRepository.save(userUpdate);
