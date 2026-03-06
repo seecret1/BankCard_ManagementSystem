@@ -51,7 +51,8 @@ public class UserServiceImpl implements UserService {
         return new PageResponse<>(
                 page.getTotalElements(),
                 page.getTotalPages(),
-                userMapper.toListResponse(page.getContent()));
+                userMapper.toListResponse(page.getContent())
+        );
     }
 
     @Override
