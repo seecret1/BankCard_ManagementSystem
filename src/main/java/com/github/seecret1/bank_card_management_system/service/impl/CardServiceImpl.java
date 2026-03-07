@@ -177,8 +177,8 @@ public class CardServiceImpl implements CardService {
         if (!cardsList.contains(cardMapper.toEntity(card, user))) {
             throw new CardNotFoundException(
                     MessageFormat.format(
-                            "The card width criterial {0} was not found for this user: {1}, "
-                            , cardCriterial, user)
+                            "The card width criterial {0} was not found for this user: {1}, ",
+                            cardCriterial, user)
             );
         }
 
