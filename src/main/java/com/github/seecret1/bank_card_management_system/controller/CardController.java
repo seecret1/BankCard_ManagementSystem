@@ -41,17 +41,18 @@ public class CardController {
     }
 
     @GetMapping("/{criterial}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CardResponse> findByCriterial(
             @PathVariable String criterial
     ) {
         return ResponseEntity.ok(cardService.findByCriterial(criterial));
     }
 
-    @GetMapping("/user/{criterial}")
-    public ResponseEntity<List<CardResponse>> findCardsUser(
-            @PathVariable String criterial
+    @GetMapping("/your/{userCriterial}")
+    public ResponseEntity<List<CardResponse>> findYourCards(
+            @PathVariable String userCriterial
     ) {
-        return ResponseEntity.ok(cardService.findCardsUser(criterial));
+        return ResponseEntity.ok(cardService.findCardsUser(userCriterial));
     }
 
     @PostMapping("/create")

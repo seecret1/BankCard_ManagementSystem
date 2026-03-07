@@ -20,10 +20,12 @@ import com.github.seecret1.bank_card_management_system.repository.specification.
 import com.github.seecret1.bank_card_management_system.service.CardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.InvalidParameterException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -93,6 +95,11 @@ public class CardServiceImpl implements CardService {
                         "User not found by email: " + criterial
                 ));
 
+        if (request.getDateExpiry().isBefore(LocalDate.now())) {
+            throw new InvalidParameterException(
+                    "Date expiry is before now!"
+            );
+        }
         var card = cardRepository.save(cardMapper.toEntity(request, user));
         log.debug("Created card: {}", card);
         log.info("Create card successful");
@@ -129,6 +136,7 @@ public class CardServiceImpl implements CardService {
         log.info("Transfer money cards");
         String numberFrom = request.getNumberFrom();
         String numberTo = request.getNumberTo();
+
         var cardFrom = cardRepository.findByCriterial(numberFrom)
                 .orElseThrow(() -> new CardNotFoundException(
                         "Card not found by number: " + numberFrom
@@ -138,27 +146,13 @@ public class CardServiceImpl implements CardService {
                         "Card not found by number: " + numberTo
                 ));
 
-        if (cardFrom.getStatus() != CardStatus.ACTIVE &&
-                cardTo.getStatus() != CardStatus.ACTIVE) {
-            throw new CardStatusException("The card status cannot be transferred");
-        }
-        if (!checkCardValid(cardFrom) || !checkCardValid(cardTo)) {
-            throw new CardStatusException("The card status cannot be expired");
-        }
-        if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidTransferException(
-                    "The amount cannot be negative"
-            );
-        }
-        if (cardFrom.getBalance().compareTo(request.getAmount()) >= 0) {
-            throw new InvalidTransferException(
-                    "Card balance < transfer amount"
-            );
-        }
+        var amount = request.getAmount();
+        validateTransfer(amount, cardFrom, cardTo);
+
         log.debug("Transfer money cards request: {}", request);
 
-        cardFrom.setBalance(cardFrom.getBalance().subtract(request.getAmount()));
-        cardTo.setBalance(cardTo.getBalance().add(request.getAmount()));
+        cardFrom.setBalance(cardFrom.getBalance().subtract(amount));
+        cardTo.setBalance(cardTo.getBalance().add(amount));
         cardRepository.save(cardFrom);
         cardRepository.save(cardTo);
 
@@ -174,12 +168,42 @@ public class CardServiceImpl implements CardService {
                         "User not found by criterial: " + userCriterial
                 ));
 
+        var cardsList = user.getCards();
         log.debug("Delete card by criterial: {}, and user by criterial: {}",
                 cardCriterial, userCriterial);
 
         var card = findByCriterial(cardCriterial);
+
+        if (!cardsList.contains(cardMapper.toEntity(card, user))) {
+            throw new CardNotFoundException(
+                    MessageFormat.format(
+                            "The card width criterial {0} was not found for this user: {1}, "
+                            , cardCriterial, user)
+            );
+        }
+
         cardRepository.delete(cardMapper.toEntity(card, user));
         log.info("Delete card successful");
+    }
+
+    private void validateTransfer(BigDecimal amount, Card cardFrom, Card cardTo) {
+        if (cardFrom.getStatus() != CardStatus.ACTIVE &&
+                cardTo.getStatus() != CardStatus.ACTIVE) {
+            throw new CardStatusException("The card status cannot be transferred");
+        }
+        if (!checkCardValid(cardFrom) || !checkCardValid(cardTo)) {
+            throw new CardStatusException("The card status cannot be expired");
+        }
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidTransferException(
+                    "The amount cannot be negative"
+            );
+        }
+        if (cardFrom.getBalance().compareTo(amount) >= 0) {
+            throw new InvalidTransferException(
+                    "Card balance < transfer amount"
+            );
+        }
     }
 
     private boolean checkCardValid(Card card) {
