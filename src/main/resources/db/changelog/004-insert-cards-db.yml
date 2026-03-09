@@ -7,6 +7,9 @@ databaseChangeLog:
             tableName: cards
             columns:
               - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
                   name: number
                   value: 1234567891234561
               - column:
@@ -28,6 +31,9 @@ databaseChangeLog:
         - insert:
             tableName: cards
             columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
               - column:
                   name: number
                   value: 1234567891234562
@@ -51,6 +57,9 @@ databaseChangeLog:
             tableName: cards
             columns:
               - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
                   name: number
                   value: 1234567891234563
               - column:
@@ -72,6 +81,9 @@ databaseChangeLog:
         - insert:
             tableName: cards
             columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
               - column:
                   name: number
                   value: 1234567891234564
@@ -95,6 +107,9 @@ databaseChangeLog:
             tableName: cards
             columns:
               - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
                   name: number
                   value: 1234567891234565
               - column:
@@ -116,6 +131,9 @@ databaseChangeLog:
         - insert:
             tableName: cards
             columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
               - column:
                   name: number
                   value: 1234567891234566
@@ -139,6 +157,9 @@ databaseChangeLog:
             tableName: cards
             columns:
               - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
                   name: number
                   value: 1234567891234567
               - column:
@@ -160,6 +181,9 @@ databaseChangeLog:
         - insert:
             tableName: cards
             columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
               - column:
                   name: number
                   value: 1234567891234568
@@ -183,6 +207,9 @@ databaseChangeLog:
             tableName: cards
             columns:
               - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
                   name: number
                   value: 1234567891234569
               - column:
@@ -204,6 +231,9 @@ databaseChangeLog:
         - insert:
             tableName: cards
             columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
               - column:
                   name: number
                   value: 1234567891234570
@@ -227,6 +257,9 @@ databaseChangeLog:
             tableName: cards
             columns:
               - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
                   name: number
                   value: 1234567891234571
               - column:
@@ -249,6 +282,9 @@ databaseChangeLog:
             tableName: cards
             columns:
               - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
                   name: number
                   value: 1234567891234572
               - column:
@@ -270,6 +306,9 @@ databaseChangeLog:
         - insert:
             tableName: cards
             columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
               - column:
                   name: number
                   value: 1234567891234573
@@ -294,6 +333,9 @@ databaseChangeLog:
             tableName: cards
             columns:
               - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
                   name: number
                   value: 1234567891234574
               - column:
@@ -315,6 +357,9 @@ databaseChangeLog:
         - insert:
             tableName: cards
             columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
               - column:
                   name: number
                   value: 1234567891234575
@@ -338,6 +383,9 @@ databaseChangeLog:
             tableName: cards
             columns:
               - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
                   name: number
                   value: 1234567891234576
               - column:
@@ -359,6 +407,9 @@ databaseChangeLog:
         - insert:
             tableName: cards
             columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
               - column:
                   name: number
                   value: 1234567891234577
@@ -382,6 +433,9 @@ databaseChangeLog:
             tableName: cards
             columns:
               - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
                   name: number
                   value: 1234567891234578
               - column:
@@ -404,6 +458,9 @@ databaseChangeLog:
             tableName: cards
             columns:
               - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
+              - column:
                   name: number
                   value: 1234567891234579
               - column:
@@ -425,6 +482,9 @@ databaseChangeLog:
         - insert:
             tableName: cards
             columns:
+              - column:
+                  name: id
+                  valueComputed: gen_random_uuid()
               - column:
                   name: number
                   value: 1234567891234580

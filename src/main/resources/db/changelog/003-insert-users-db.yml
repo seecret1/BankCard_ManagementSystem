@@ -9,7 +9,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: UUID
-                  defaultValue: gen_random_uuid()
+                  valueComputed: gen_random_uuid()
               - column:
                   name: username
                   value: admin-admin
@@ -41,7 +41,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: UUID
-                  defaultValue: gen_random_uuid()
+                  valueComputed: gen_random_uuid()
               - column:
                   name: username
                   value: pashaPasha
@@ -70,7 +70,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: UUID
-                  defaultValue: gen_random_uuid()
+                  valueComputed: gen_random_uuid()
               - column:
                   name: username
                   value: seecretNumber1
@@ -99,7 +99,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: UUID
-                  defaultValue: gen_random_uuid()
+                  valueComputed: gen_random_uuid()
               - column:
                   name: username
                   value: americanBoy
@@ -128,7 +128,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: UUID
-                  defaultValue: gen_random_uuid()
+                  valueComputed: gen_random_uuid()
               - column:
                   name: username
                   value: RussianBoy
@@ -157,7 +157,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: UUID
-                  defaultValue: gen_random_uuid()
+                  valueComputed: gen_random_uuid()
               - column:
                   name: username
                   value: adam-smitt
@@ -186,7 +186,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: UUID
-                  defaultValue: gen_random_uuid()
+                  valueComputed: gen_random_uuid()
               - column:
                   name: username
                   value: jhon-benefit
@@ -215,7 +215,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: UUID
-                  defaultValue: gen_random_uuid()
+                  valueComputed: gen_random_uuid()
               - column:
                   name: username
                   value: default-paren
@@ -244,7 +244,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: UUID
-                  defaultValue: gen_random_uuid()
+                  valueComputed: gen_random_uuid()
               - column:
                   name: username
                   value: super-volik
@@ -273,7 +273,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: UUID
-                  defaultValue: gen_random_uuid()
+                  valueComputed: gen_random_uuid()
               - column:
                   name: username
                   value: main-kaptain

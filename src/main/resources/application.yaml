@@ -4,6 +4,7 @@ server:
 spring:
   liquibase:
     change-log: classpath:db/master.xml
+    clear-checksums: true
   datasource:
     url: jdbc:postgresql://localhost:5433/bank_db
     username: ${USERNAME_DB}

@@ -8,7 +8,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: VARCHAR
+                  type: UUID
                   constraints:
                     primaryKey: true
                     nullable: false
