@@ -4,6 +4,4 @@
 
     <include file="classpath:db/changelog/001-create-user-db.yml" relativeToChangelogFile="false"/>
     <include file="classpath:db/changelog/002-create-card-db.yml" relativeToChangelogFile="false"/>
-    <include file="classpath:db/changelog/003-insert-users-db.yml" relativeToChangelogFile="false"/>
-    <include file="classpath:db/changelog/004-insert-cards-db.yml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
