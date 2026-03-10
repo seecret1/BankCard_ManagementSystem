@@ -109,18 +109,18 @@ public class CardServiceImpl implements CardService {
     @Override
     public CardResponse updateStatus(UpdateStatusCardRequest request) {
         log.info("Update status for card: {}", request.getNumber());
-        var card = cardRepository.findByCriterial(request.getNumber())
+        var card = cardRepository.findCardByNumber(request.getNumber())
                 .orElseThrow(() -> new CardNotFoundException(
                         "Card not found by id: " + request.getNumber()
                 ));
 
         CardStatus status = request.getStatus();
         if (status == CardStatus.ACTIVE &&
-                card.getDateExpiry().isAfter(LocalDate.now())) {
+                card.getDateExpiry().isBefore(LocalDate.now())) {
             throw new CardStatusException("The card status cannot be active");
         }
         if (status == CardStatus.EXPIRED &&
-                card.getDateExpiry().isBefore(LocalDate.now())) {
+                card.getDateExpiry().isAfter(LocalDate.now())) {
             throw new CardStatusException("The card status cannot be expired");
         }
         card.setStatus(status);
