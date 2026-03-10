@@ -8,16 +8,17 @@ import com.github.seecret1.bank_card_management_system.entity.User;
 import com.github.seecret1.bank_card_management_system.exception.RegisterUserException;
 import com.github.seecret1.bank_card_management_system.exception.UserNotFoundException;
 import com.github.seecret1.bank_card_management_system.mapper.UserMapper;
+import com.github.seecret1.bank_card_management_system.model.PageModel;
 import com.github.seecret1.bank_card_management_system.model.UserFilterModel;
 import com.github.seecret1.bank_card_management_system.repository.UserRepository;
 import com.github.seecret1.bank_card_management_system.repository.specification.UserSpecification;
 import com.github.seecret1.bank_card_management_system.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -29,12 +30,19 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
-    public List<UserResponse> findAllUsers() {
+    public PageResponse<UserResponse> findAllUsers(PageModel pageModel) {
         log.info("Find all users");
-        List<User> users = userRepository.findAll();
 
-        log.debug("Users list: {}, size list: {}", users, users.size());
-        return userMapper.toListResponse(users);
+        Pageable pageable = pageModel.toPageRequest();
+        var page = userRepository.findAll(pageable);
+        log.debug("Find users list. page: {}, size list: {}, page list: {}",
+                page.getTotalPages(), page.getTotalElements(), page.getContent());
+
+        return new PageResponse<>(
+                page.getTotalElements(),
+                page.getTotalPages(),
+                userMapper.toListResponse(page.getContent())
+        );
     }
 
     @Override
@@ -61,17 +69,6 @@ public class UserServiceImpl implements UserService {
                         "User not found by criterial: " + criterial
                 ));
         log.debug("Found user by criterial. User: {}", user);
-        return userMapper.toResponse(user);
-    }
-
-    @Override
-    public UserResponse findByEmail(String email) {
-        log.info("Find user by email: {}", email);
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "User not found by email: " + email)
-                );
-        log.debug("Found user by email. User: {}", user);
         return userMapper.toResponse(user);
     }
 

@@ -7,18 +7,19 @@ import com.github.seecret1.bank_card_management_system.dto.response.CardResponse
 import com.github.seecret1.bank_card_management_system.dto.response.CardSummaryResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
 import com.github.seecret1.bank_card_management_system.model.CardFilterModel;
+import com.github.seecret1.bank_card_management_system.model.PageModel;
 
 import java.util.List;
 
 public interface CardService {
 
-    List<CardResponse> findAll();
+    PageResponse<CardResponse> findAll(PageModel pageModel);
 
     PageResponse<CardResponse> findByFilter(CardFilterModel filter);
 
     CardResponse findByCriterial(String criterial);
 
-    List<CardResponse> findYourCards(String userCriterial);
+    PageResponse<CardResponse> findYourCards(String userCriterial, PageModel pageModel);
 
     CardResponse create(CardRequest request);
 

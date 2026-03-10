@@ -7,6 +7,7 @@ import com.github.seecret1.bank_card_management_system.dto.response.CardResponse
 import com.github.seecret1.bank_card_management_system.dto.response.CardSummaryResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
 import com.github.seecret1.bank_card_management_system.model.CardFilterModel;
+import com.github.seecret1.bank_card_management_system.model.PageModel;
 import com.github.seecret1.bank_card_management_system.service.CardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,10 @@ public class CardController {
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<CardResponse>> findAllCards() {
-        return ResponseEntity.ok(cardService.findAll());
+    public ResponseEntity<PageResponse<CardResponse>> findAllCards(
+            @Valid PageModel pageModel
+    ) {
+        return ResponseEntity.ok(cardService.findAll(pageModel));
     }
 
     @GetMapping("/filter")
@@ -49,10 +52,11 @@ public class CardController {
     }
 
     @GetMapping("/your/{userCriterial}")
-    public ResponseEntity<List<CardResponse>> findYourCards(
-            @PathVariable String userCriterial
+    public ResponseEntity<PageResponse<CardResponse>> findYourCards(
+            @PathVariable String userCriterial,
+            @Valid PageModel pageModel
     ) {
-        return ResponseEntity.ok(cardService.findYourCards(userCriterial));
+        return ResponseEntity.ok(cardService.findYourCards(userCriterial, pageModel));
     }
 
     @PostMapping("/create")

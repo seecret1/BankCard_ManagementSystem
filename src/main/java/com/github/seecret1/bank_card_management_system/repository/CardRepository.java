@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.List;
 
 @Repository
 public interface CardRepository extends JpaRepository<Card, String>, JpaSpecificationExecutor<Card> {
@@ -22,7 +21,12 @@ public interface CardRepository extends JpaRepository<Card, String>, JpaSpecific
 
     @Override
     @EntityGraph(attributePaths = {"user"})
-    List<Card> findAll();
+    Page<Card> findAll(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"user"})
+    @Query("SELECT c FROM Card c JOIN c.user u" +
+            " WHERE u.id = :criterial OR u.email = :criterial OR u.username = :criterial")
+    Page<Card> findAllByUserCriterial(String criterial, Pageable pageable);
 
     @EntityGraph(attributePaths = {"user"})
     Optional<Card> findByNumberHash(String numberHash);

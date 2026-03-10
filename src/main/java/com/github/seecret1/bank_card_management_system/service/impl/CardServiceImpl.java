@@ -11,6 +11,7 @@ import com.github.seecret1.bank_card_management_system.entity.enums.CardStatus;
 import com.github.seecret1.bank_card_management_system.exception.*;
 import com.github.seecret1.bank_card_management_system.mapper.CardMapper;
 import com.github.seecret1.bank_card_management_system.model.CardFilterModel;
+import com.github.seecret1.bank_card_management_system.model.PageModel;
 import com.github.seecret1.bank_card_management_system.repository.CardRepository;
 import com.github.seecret1.bank_card_management_system.repository.UserRepository;
 import com.github.seecret1.bank_card_management_system.repository.specification.CardSpecification;
@@ -19,6 +20,7 @@ import com.github.seecret1.bank_card_management_system.util.CardHashUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.InvalidParameterException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,11 +41,20 @@ public class CardServiceImpl implements CardService {
     private final CardMapper cardMapper;
 
     @Override
-    public List<CardResponse> findAll() {
-        log.info("Find all cards");
-        List<Card> cards = cardRepository.findAll();
-        log.debug("Cards list: {}", cards);
-        return cardMapper.toDtoResponseList(cards);
+    public PageResponse<CardResponse> findAll(PageModel pageModel) {
+        log.info("Find all page cards");
+
+        Pageable pageable = pageModel.toPageRequest();
+        var pageResult = cardRepository.findAll(pageable);
+
+        log.debug("Find cards list. page: {}, page size: {}, page elements: {}",
+                pageResult.getTotalPages(), pageResult.getTotalElements(), pageResult.getContent());
+
+        return new PageResponse<>(
+                pageResult.getTotalElements(),
+                pageResult.getTotalPages(),
+                cardMapper.toDtoResponseList(pageResult.getContent())
+        );
     }
 
     @Override
@@ -70,15 +81,25 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public List<CardResponse> findYourCards(String userCriterial) {
-        log.info("Find cards by user: {}", userCriterial);
-        var user = userRepository.findByCriterial(userCriterial)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "User not found by criterial: " + userCriterial
-                ));
-        var listCards = user.getCards();
-        log.debug("List cards: {}, user: {}", listCards, user);
-        return cardMapper.toYourDtoResponseList(listCards.stream().toList());
+    public PageResponse<CardResponse> findYourCards(String userCriterial, PageModel pageModel) {
+        log.info("Find cards by user criterial: {}, page: {}, size: {}",
+                userCriterial, pageModel.getNumber(), pageModel.getSize());
+
+        if (!userRepository.existsById(userCriterial)) {
+            throw new UserNotFoundException(
+                    "User not found by criterial: " + userCriterial
+            );
+        }
+        Pageable pageable = pageModel.toPageRequest();
+        var page = cardRepository.findAllByUserCriterial(userCriterial, pageable);
+        log.debug("Found {} cards for user {}, total pages: {}",
+                page.getContent().size(), userCriterial, page.getTotalPages());
+
+        return new PageResponse<>(
+                page.getTotalElements(),
+                page.getTotalPages(),
+                cardMapper.toYourDtoResponseList(page.getContent())
+        );
     }
 
     @Override

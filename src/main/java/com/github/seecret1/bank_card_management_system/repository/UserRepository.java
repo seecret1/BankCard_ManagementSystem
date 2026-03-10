@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, String>, JpaSpecificationExecutor<User> {
@@ -18,7 +17,7 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     Page<User> findAll(Specification<User> spec, Pageable pageable);
 
     @Override
-    List<User> findAll();
+    Page<User> findAll(Pageable pageable);
 
     Optional<User> findByUsername(String username);
 

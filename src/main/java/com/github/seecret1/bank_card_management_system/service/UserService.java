@@ -4,19 +4,19 @@ import com.github.seecret1.bank_card_management_system.dto.request.CreateUserReq
 import com.github.seecret1.bank_card_management_system.dto.request.UpdateUserRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.UserResponse;
+import com.github.seecret1.bank_card_management_system.model.PageModel;
 import com.github.seecret1.bank_card_management_system.model.UserFilterModel;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface UserService {
 
-    List<UserResponse> findAllUsers();
+    PageResponse<UserResponse> findAllUsers(PageModel pageModel);
 
     PageResponse<UserResponse> findByFilter(UserFilterModel filter);
 
     UserResponse findByCriterial(String criterial);
-
-    UserResponse findByEmail(String email);
 
     UserResponse create(CreateUserRequest request);
 

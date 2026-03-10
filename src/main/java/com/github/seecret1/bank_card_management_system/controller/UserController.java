@@ -4,6 +4,7 @@ import com.github.seecret1.bank_card_management_system.dto.request.CreateUserReq
 import com.github.seecret1.bank_card_management_system.dto.request.UpdateUserRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.UserResponse;
+import com.github.seecret1.bank_card_management_system.model.PageModel;
 import com.github.seecret1.bank_card_management_system.model.UserFilterModel;
 import com.github.seecret1.bank_card_management_system.service.UserService;
 import jakarta.validation.Valid;
@@ -12,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Validated
 @RestController
@@ -24,8 +23,10 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> findAll() {
-        return ResponseEntity.ok(userService.findAllUsers());
+    public ResponseEntity<PageResponse<UserResponse>> findAll(
+            @Valid PageModel pageModel
+    ) {
+        return ResponseEntity.ok(userService.findAllUsers(pageModel));
     }
 
     @GetMapping("/filter")
