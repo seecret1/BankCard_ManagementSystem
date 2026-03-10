@@ -1,5 +1,6 @@
 package com.github.seecret1.bank_card_management_system.entity;
 
+import com.github.seecret1.bank_card_management_system.converter.CardNumberConverter;
 import com.github.seecret1.bank_card_management_system.entity.enums.CardStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,8 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Convert(converter = CardNumberConverter.class)
+    @Column(columnDefinition = "TEXT")
     private String number;
 
     private LocalDate dateActivation;

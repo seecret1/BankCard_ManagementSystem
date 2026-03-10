@@ -24,3 +24,6 @@ user-service:
     secret: ${SECRET_KEY}
     tokenExpiration: 5m
     refreshTokenExpiration: 30m
+
+encryption:
+  secret: ${ENCRYPTION_SECRET}

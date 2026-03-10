@@ -7,6 +7,7 @@ import com.github.seecret1.bank_card_management_system.dto.response.UserInfoResp
 import com.github.seecret1.bank_card_management_system.entity.Card;
 import com.github.seecret1.bank_card_management_system.entity.User;
 import com.github.seecret1.bank_card_management_system.entity.enums.CardStatus;
+import com.github.seecret1.bank_card_management_system.util.CardMaskUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public final class CardMapper {
 
     public CardResponse toDtoResponse(Card card) {
         CardResponse dto = new CardResponse();
-        dto.setNumber(card.getNumber());
+        dto.setNumber(CardMaskUtil.maskCardNumber(card.getNumber()));
         dto.setDateActivation(card.getDateActivation());
         dto.setDateExpiry(card.getDateExpiry());
         dto.setStatus(card.getStatus());
@@ -64,22 +65,11 @@ public final class CardMapper {
 
     public CardSummaryResponse toResponse(Card card) {
         CardSummaryResponse dto = new CardSummaryResponse();
-        dto.setNumber(card.getNumber());
+        dto.setNumber(CardMaskUtil.maskCardNumber(card.getNumber()));
         dto.setStatus(card.getStatus());
         dto.setBalance(card.getBalance());
 
         return dto;
-    }
-
-    public Card toEntity(CardResponse response, User user) {
-        Card card = new Card();
-        card.setNumber(response.getNumber());
-        card.setDateActivation(response.getDateActivation());
-        card.setDateExpiry(response.getDateExpiry());
-        card.setStatus(response.getStatus());
-        card.setBalance(response.getBalance());
-        card.setUser(user);
-        return card;
     }
 
     public Card toEntity(CardRequest request, User user) {

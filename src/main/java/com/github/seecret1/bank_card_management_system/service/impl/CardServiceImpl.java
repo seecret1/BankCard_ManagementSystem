@@ -111,7 +111,7 @@ public class CardServiceImpl implements CardService {
         log.info("Update status for card: {}", request.getNumber());
         var card = cardRepository.findCardByNumber(request.getNumber())
                 .orElseThrow(() -> new CardNotFoundException(
-                        "Card not found by id: " + request.getNumber()
+                        "Card not found by number: " + request.getNumber()
                 ));
 
         CardStatus status = request.getStatus();

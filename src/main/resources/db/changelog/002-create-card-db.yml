@@ -14,7 +14,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: number
-                  type: VARCHAR(16)
+                  type: VARCHAR(120)
                   constraints:
                     nullable: false
                     unique: true

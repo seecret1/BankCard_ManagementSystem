@@ -2,6 +2,7 @@ package com.github.seecret1.bank_card_management_system.dto.request;
 
 import com.github.seecret1.bank_card_management_system.entity.enums.CardStatus;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +17,6 @@ public class UpdateStatusCardRequest {
     @Size(min = 16, max = 16, message = "The card number must contain 16 characters")
     private String number;
 
-    @NotBlank(message = "Status must be set!")
+    @NotNull(message = "Status must be set!")
     private CardStatus status;
 }
