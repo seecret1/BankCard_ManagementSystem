@@ -133,30 +133,28 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public List<CardSummaryResponse> transferMoney(TransferMoneyRequest request) {
-        log.info("Transfer money cards");
-        String numberFrom = request.getNumberFrom();
-        String numberTo = request.getNumberTo();
 
-        var cardFrom = cardRepository.findByCriterial(numberFrom)
-                .orElseThrow(() -> new CardNotFoundException(
-                        "Card not found by number: " + numberFrom
-                ));
-        var cardTo = cardRepository.findByCriterial(numberTo)
-                .orElseThrow(() -> new CardNotFoundException(
-                        "Card not found by number: " + numberTo
-                ));
+        List<Card> cards = startTransfer(request);
+        var cardFrom = cards.get(0);
+        var cardTo = cards.get(1);
 
-        var amount = request.getAmount();
-        validateTransfer(amount, cardFrom, cardTo);
+        completeTransfer(request, cardFrom, cardTo, request.getAmount());
+        return List.of(cardMapper.toResponse(cardFrom), cardMapper.toResponse(cardTo));
+    }
 
-        log.debug("Transfer money cards request: {}", request);
+    @Override
+    @Transactional
+    public List<CardSummaryResponse> transferMoneyYourCards(TransferMoneyRequest request) {
 
-        cardFrom.setBalance(cardFrom.getBalance().subtract(amount));
-        cardTo.setBalance(cardTo.getBalance().add(amount));
-        cardRepository.save(cardFrom);
-        cardRepository.save(cardTo);
+        List<Card> cards = startTransfer(request);
+        var cardFrom = cards.get(0);
+        var cardTo = cards.get(1);
 
-        log.info("Transfer card successful");
+        if (!cardFrom.getUser().getId().equals(cardTo.getUser().getId())) {
+            throw new InvalidTransferException("The numbers listed do not belong to the same user");
+        }
+
+        completeTransfer(request, cardFrom, cardTo, request.getAmount());
         return List.of(cardMapper.toResponse(cardFrom), cardMapper.toResponse(cardTo));
     }
 
@@ -175,6 +173,41 @@ public class CardServiceImpl implements CardService {
 
         cardRepository.delete(card);
         log.info("Delete card successful");
+    }
+
+    private List<Card> startTransfer(TransferMoneyRequest request) {
+        log.info("Transfer money cards");
+        String numberFrom = request.getNumberFrom();
+        String numberTo = request.getNumberTo();
+
+        var cardFrom = cardRepository.findByCriterial(numberFrom)
+                .orElseThrow(() -> new CardNotFoundException(
+                        "Card not found by number: " + numberFrom
+                ));
+        var cardTo = cardRepository.findByCriterial(numberTo)
+                .orElseThrow(() -> new CardNotFoundException(
+                        "Card not found by number: " + numberTo
+                ));
+
+        return List.of(cardFrom, cardTo);
+    }
+
+    private void completeTransfer(
+            TransferMoneyRequest request,
+            Card cardFrom,
+            Card cardTo,
+            BigDecimal amount
+    ) {
+        validateTransfer(amount, cardFrom, cardTo);
+
+        log.debug("Transfer money cards request: {}", request);
+
+        cardFrom.setBalance(cardFrom.getBalance().subtract(amount));
+        cardTo.setBalance(cardTo.getBalance().add(amount));
+        cardRepository.save(cardFrom);
+        cardRepository.save(cardTo);
+
+        log.info("Transfer card successful");
     }
 
     private void validateTransfer(BigDecimal amount, Card cardFrom, Card cardTo) {

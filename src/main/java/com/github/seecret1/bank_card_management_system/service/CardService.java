@@ -26,5 +26,7 @@ public interface CardService {
 
     List<CardSummaryResponse> transferMoney(TransferMoneyRequest request);
 
+    List<CardSummaryResponse> transferMoneyYourCards(TransferMoneyRequest request);
+
     void delete(String cardCriterial, String userCriterial);
 }

@@ -79,6 +79,13 @@ public class CardController {
         return ResponseEntity.ok(cardService.transferMoney(request));
     }
 
+    @PostMapping("/transfer/your")
+    public ResponseEntity<List<CardSummaryResponse>> transferMoneyYourCards(
+            @Valid @RequestBody TransferMoneyRequest request
+    ) {
+        return ResponseEntity.ok(cardService.transferMoneyYourCards(request));
+    }
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/delete/{cardCriterial}/user/{userCriterial}")
     public ResponseEntity<?> deleteCards(
