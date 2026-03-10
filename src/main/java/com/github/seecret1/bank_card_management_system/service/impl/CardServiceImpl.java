@@ -180,11 +180,11 @@ public class CardServiceImpl implements CardService {
         String numberFrom = request.getNumberFrom();
         String numberTo = request.getNumberTo();
 
-        var cardFrom = cardRepository.findByCriterial(numberFrom)
+        var cardFrom = cardRepository.findCardByNumber(numberFrom)
                 .orElseThrow(() -> new CardNotFoundException(
                         "Card not found by number: " + numberFrom
                 ));
-        var cardTo = cardRepository.findByCriterial(numberTo)
+        var cardTo = cardRepository.findCardByNumber(numberTo)
                 .orElseThrow(() -> new CardNotFoundException(
                         "Card not found by number: " + numberTo
                 ));

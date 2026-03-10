@@ -28,6 +28,10 @@ public interface CardRepository extends JpaRepository<Card, String>, JpaSpecific
     @Query("SELECT c FROM Card c WHERE c.id = :criterial OR c.number = :criterial")
     Optional<Card> findByCriterial(String criterial);
 
+    @EntityGraph(attributePaths = {"user"})
+    Optional<Card> findCardByNumber(String number);
+
+    @EntityGraph(attributePaths = {"user"})
     @Query("SELECT c FROM Card c JOIN c.user u WHERE (c.id = :cardCriterial OR c.number = :cardCriterial) " +
             "AND (u.id = :userCriterial OR u.email = :userCriterial OR u.username = :userCriterial)")
     Optional<Card> findCardAndUserByCriterial(String cardCriterial, String userCriterial);
