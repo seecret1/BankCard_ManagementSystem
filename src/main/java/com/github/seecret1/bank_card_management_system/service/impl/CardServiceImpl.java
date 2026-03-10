@@ -8,16 +8,14 @@ import com.github.seecret1.bank_card_management_system.dto.response.CardSummaryR
 import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
 import com.github.seecret1.bank_card_management_system.entity.Card;
 import com.github.seecret1.bank_card_management_system.entity.enums.CardStatus;
-import com.github.seecret1.bank_card_management_system.exception.CardNotFoundException;
-import com.github.seecret1.bank_card_management_system.exception.CardStatusException;
-import com.github.seecret1.bank_card_management_system.exception.InvalidTransferException;
-import com.github.seecret1.bank_card_management_system.exception.UserNotFoundException;
+import com.github.seecret1.bank_card_management_system.exception.*;
 import com.github.seecret1.bank_card_management_system.mapper.CardMapper;
 import com.github.seecret1.bank_card_management_system.model.CardFilterModel;
 import com.github.seecret1.bank_card_management_system.repository.CardRepository;
 import com.github.seecret1.bank_card_management_system.repository.UserRepository;
 import com.github.seecret1.bank_card_management_system.repository.specification.CardSpecification;
 import com.github.seecret1.bank_card_management_system.service.CardService;
+import com.github.seecret1.bank_card_management_system.util.CardHashUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.InvalidParameterException;
@@ -25,9 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -66,16 +64,13 @@ public class CardServiceImpl implements CardService {
     @Override
     public CardResponse findByCriterial(String criterial) {
         log.info("Find card by criterial: {}", criterial);
-        var card = cardRepository.findByCriterial(criterial)
-                .orElseThrow(() -> new CardNotFoundException(
-                        "Card not found by criterial: " + criterial
-                ));
-        log.debug("Find by criterial card: {}", card.toString());
+        var card = findCardByCriterial(criterial);
+        log.debug("Find by criterial card: {}", card);
         return cardMapper.toDtoResponse(card);
     }
 
     @Override
-    public List<CardResponse> findCardsUser(String userCriterial) {
+    public List<CardResponse> findYourCards(String userCriterial) {
         log.info("Find cards by user: {}", userCriterial);
         var user = userRepository.findByCriterial(userCriterial)
                 .orElseThrow(() -> new UserNotFoundException(
@@ -83,13 +78,21 @@ public class CardServiceImpl implements CardService {
                 ));
         var listCards = user.getCards();
         log.debug("List cards: {}, user: {}", listCards, user);
-        return cardMapper.toDtoResponseList(listCards.stream().toList());
+        return cardMapper.toYourDtoResponseList(listCards.stream().toList());
     }
 
     @Override
     public CardResponse create(CardRequest request) {
         String criterial = request.getUserCriterial();
         log.info("Creating a user card, criterial: {}", criterial);
+
+        String hash = CardHashUtil.hash(request.getNumber());
+        if (cardRepository.existsByNumberHash(hash)) {
+            throw new CardExistsException(
+                    "Card with number " + request.getNumber() + " already exists"
+            );
+        }
+
         var user = userRepository.findByCriterial(criterial)
                 .orElseThrow(() -> new UserNotFoundException(
                         "User not found by email: " + criterial
@@ -109,7 +112,9 @@ public class CardServiceImpl implements CardService {
     @Override
     public CardResponse updateStatus(UpdateStatusCardRequest request) {
         log.info("Update status for card: {}", request.getNumber());
-        var card = cardRepository.findCardByNumber(request.getNumber())
+
+        String hash = CardHashUtil.hash(request.getNumber());
+        var card = cardRepository.findByNumberHash(hash)
                 .orElseThrow(() -> new CardNotFoundException(
                         "Card not found by number: " + request.getNumber()
                 ));
@@ -159,18 +164,9 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public void delete(String cardCriterial, String userCriterial) {
-        log.info("Delete card by criterial, cardCriterial: {}, userCriterial: {}",
-                cardCriterial, userCriterial);
-
-        var card = cardRepository.findCardAndUserByCriterial(cardCriterial, userCriterial)
-                .orElseThrow(() -> new CardNotFoundException(
-                        MessageFormat.format(
-                                "The card with criterial {0} was not found for this user: {1}",
-                                cardCriterial, userCriterial
-                        )
-                ));
-
+    public void delete(String criterial) {
+        log.info("Delete card by criterial: {}", criterial);
+        var card = findCardByCriterial(criterial);
         cardRepository.delete(card);
         log.info("Delete card successful");
     }
@@ -180,11 +176,11 @@ public class CardServiceImpl implements CardService {
         String numberFrom = request.getNumberFrom();
         String numberTo = request.getNumberTo();
 
-        var cardFrom = cardRepository.findCardByNumber(numberFrom)
+        var cardFrom = cardRepository.findByNumberHash(CardHashUtil.hash(numberFrom))
                 .orElseThrow(() -> new CardNotFoundException(
                         "Card not found by number: " + numberFrom
                 ));
-        var cardTo = cardRepository.findCardByNumber(numberTo)
+        var cardTo = cardRepository.findByNumberHash(CardHashUtil.hash(numberTo))
                 .orElseThrow(() -> new CardNotFoundException(
                         "Card not found by number: " + numberTo
                 ));
@@ -246,5 +242,26 @@ public class CardServiceImpl implements CardService {
         }
 
         return true;
+    }
+
+    private Card findCardByCriterial(String criterial) {
+        log.debug("Searching card by criterial: {}", criterial);
+
+        if (criterial != null && criterial.length() == 36) {
+            Optional<Card> byId = cardRepository.findById(criterial);
+            if (byId.isPresent()) {
+                log.debug("Card found by ID: {}", criterial);
+                return byId.get();
+            }
+        }
+
+        String hash = CardHashUtil.hash(criterial);
+        Optional<Card> byHash = cardRepository.findByNumberHash(hash);
+        if (byHash.isPresent()) {
+            log.debug("Card found by number hash: {}", criterial);
+            return byHash.get();
+        }
+
+        throw new CardNotFoundException("Card not found by criterial: " + criterial);
     }
 }

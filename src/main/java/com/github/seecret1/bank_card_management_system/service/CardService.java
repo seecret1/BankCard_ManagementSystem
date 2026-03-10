@@ -18,7 +18,7 @@ public interface CardService {
 
     CardResponse findByCriterial(String criterial);
 
-    List<CardResponse> findCardsUser(String userCriterial);
+    List<CardResponse> findYourCards(String userCriterial);
 
     CardResponse create(CardRequest request);
 
@@ -28,5 +28,5 @@ public interface CardService {
 
     List<CardSummaryResponse> transferMoneyYourCards(TransferMoneyRequest request);
 
-    void delete(String cardCriterial, String userCriterial);
+    void delete(String criterial);
 }

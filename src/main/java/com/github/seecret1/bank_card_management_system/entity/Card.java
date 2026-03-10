@@ -27,6 +27,8 @@ public class Card {
     @Column(columnDefinition = "TEXT")
     private String number;
 
+    private String numberHash;
+
     private LocalDate dateActivation;
 
     private LocalDate dateExpiry;
@@ -42,6 +44,7 @@ public class Card {
 
     public Card(
             String number,
+            String numberHash,
             LocalDate dateActivation,
             LocalDate dateExpiry,
             CardStatus status,
@@ -49,6 +52,7 @@ public class Card {
             User user
     ) {
         this.number = number;
+        this.numberHash = numberHash;
         this.dateActivation = dateActivation;
         this.dateExpiry = dateExpiry;
         this.status = status;

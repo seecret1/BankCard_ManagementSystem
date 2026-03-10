@@ -52,7 +52,7 @@ public class CardController {
     public ResponseEntity<List<CardResponse>> findYourCards(
             @PathVariable String userCriterial
     ) {
-        return ResponseEntity.ok(cardService.findCardsUser(userCriterial));
+        return ResponseEntity.ok(cardService.findYourCards(userCriterial));
     }
 
     @PostMapping("/create")
@@ -87,12 +87,11 @@ public class CardController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @DeleteMapping("/delete/{cardCriterial}/user/{userCriterial}")
+    @DeleteMapping("/delete/{cardCriterial}")
     public ResponseEntity<?> deleteCards(
-            @PathVariable String cardCriterial,
-            @PathVariable String userCriterial
+            @PathVariable String cardCriterial
     ) {
-        cardService.delete(cardCriterial, userCriterial);
+        cardService.delete(cardCriterial);
         return ResponseEntity.noContent().build();
     }
 }

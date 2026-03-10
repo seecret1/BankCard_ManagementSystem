@@ -19,6 +19,11 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
+                  name: number_hash
+                  type: VARCHAR(64)
+                  constraints:
+                    unique: true
+              - column:
                   name: date_activation
                   type: date
                   constraints:

@@ -7,6 +7,7 @@ import com.github.seecret1.bank_card_management_system.dto.response.UserInfoResp
 import com.github.seecret1.bank_card_management_system.entity.Card;
 import com.github.seecret1.bank_card_management_system.entity.User;
 import com.github.seecret1.bank_card_management_system.entity.enums.CardStatus;
+import com.github.seecret1.bank_card_management_system.util.CardHashUtil;
 import com.github.seecret1.bank_card_management_system.util.CardMaskUtil;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,16 @@ public final class CardMapper {
 
         for (var card : cards) {
             dtoList.add(toDtoResponse(card));
+        }
+
+        return dtoList;
+    }
+
+    public List<CardResponse> toYourDtoResponseList(List<Card> cards) {
+        List<CardResponse> dtoList = new ArrayList<>(cards.size());
+
+        for (var card : cards) {
+            dtoList.add(toYourDtoResponse(card));
         }
 
         return dtoList;
@@ -63,8 +74,34 @@ public final class CardMapper {
         return dto;
     }
 
+    public CardResponse toYourDtoResponse(Card card) {
+        CardResponse dto = new CardResponse();
+        dto.setNumber(card.getNumber());
+        dto.setDateActivation(card.getDateActivation());
+        dto.setDateExpiry(card.getDateExpiry());
+        dto.setStatus(card.getStatus());
+        dto.setBalance(card.getBalance());
+
+        if (card.getUser() != null) {
+            User user = card.getUser();
+            UserInfoResponse response = new UserInfoResponse();
+            response.setUsername(user.getUsername());
+            response.setEmail(user.getEmail());
+            response.setFirstName(user.getFirstName());
+            response.setLastName(user.getLastName());
+            response.setMiddleName(user.getMiddleName());
+            response.setBirthDate(user.getBirthDate());
+            response.setRole(user.getRole());
+
+            dto.setUser(response);
+        }
+
+        return dto;
+    }
+
     public CardSummaryResponse toResponse(Card card) {
         CardSummaryResponse dto = new CardSummaryResponse();
+        dto.setNumber(card.getNumber());
         dto.setNumber(CardMaskUtil.maskCardNumber(card.getNumber()));
         dto.setStatus(card.getStatus());
         dto.setBalance(card.getBalance());
@@ -75,6 +112,7 @@ public final class CardMapper {
     public Card toEntity(CardRequest request, User user) {
         Card card = new Card();
         card.setNumber(request.getNumber());
+        card.setNumberHash(CardHashUtil.hash(request.getNumber()));
         card.setDateActivation(request.getDateActivation());
         card.setDateExpiry(request.getDateExpiry());
         card.setBalance(request.getBalance());
