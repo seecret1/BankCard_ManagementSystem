@@ -178,7 +178,13 @@ public class CardServiceImpl implements CardService {
     }
 
     private void validateTransfer(BigDecimal amount, Card cardFrom, Card cardTo) {
-        if (cardFrom.getStatus() != CardStatus.ACTIVE &&
+        if (cardFrom.getNumber().equals(cardTo.getNumber())) {
+            throw new InvalidTransferException(
+                    "it is impossible to carry out a transaction with the same cards"
+            );
+        }
+
+        if (cardFrom.getStatus() != CardStatus.ACTIVE ||
                 cardTo.getStatus() != CardStatus.ACTIVE) {
             throw new CardStatusException("The card status cannot be transferred");
         }
