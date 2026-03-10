@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -52,6 +53,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public JwtAuthenticationDto singUp(CreateUserRequest request) {
         String pass = request.getPassword();
         request.setPassword(passwordEncoder.encode(pass));
@@ -62,12 +64,16 @@ public class AuthServiceImpl implements AuthService {
     public JwtAuthenticationDto refreshToken(RefreshTokenRequest refreshTokenRequest) {
         String refreshToken = refreshTokenRequest.getRefreshToken();
 
-        if (refreshToken != null && jwtService.validateJwtToken(refreshToken)) {
-            var user = userService.findByEmail(jwtService.getEmailFromToken(refreshToken));
-            log.info("User requested refresh token by email: {}", user.getEmail());
-            return jwtService.refreshBaseToken(user.getEmail(), refreshToken);
+        if (refreshToken == null) {
+            throw new AuthException("Refresh token is required");
         }
-        log.error("Invalid refresh token");
-        return null;
+        if (!jwtService.validateRefreshToken(refreshToken)) {
+            throw new AuthException("Invalid or expired refresh token");
+        }
+
+        String email = jwtService.getEmailFromToken(refreshToken);
+        log.info("User requested refresh token by email: {}", email);
+
+        return jwtService.refreshBaseToken(email, refreshToken);
     }
 }

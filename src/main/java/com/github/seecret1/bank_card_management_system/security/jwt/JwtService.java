@@ -1,12 +1,19 @@
 package com.github.seecret1.bank_card_management_system.security.jwt;
 
 import com.github.seecret1.bank_card_management_system.dto.JwtAuthenticationDto;
+import com.github.seecret1.bank_card_management_system.entity.RefreshToken;
+import com.github.seecret1.bank_card_management_system.entity.User;
+import com.github.seecret1.bank_card_management_system.exception.AuthException;
+import com.github.seecret1.bank_card_management_system.repository.RefreshTokenRepository;
+import com.github.seecret1.bank_card_management_system.repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.SecretKey;
 import java.time.Duration;
@@ -16,6 +23,7 @@ import java.util.Date;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtService {
 
     @Value("${user-service.jwt.secret}")
@@ -27,18 +35,55 @@ public class JwtService {
     @Value("${user-service.jwt.refreshTokenExpiration}")
     private Duration refreshTokenExpiration;
 
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
+
+    @Transactional
     public JwtAuthenticationDto generateAuthToken(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AuthException("User not found"));
+
+        // Отзываем все предыдущие refresh токены пользователя
+        refreshTokenRepository.revokeAllByUserId(user.getId());
+
+        String jwtToken = generateJwtToken(email);
+        String refreshToken = generateRefreshToken(email);
+
+        // Сохраняем новый refresh токен в БД
+        RefreshToken refreshTokenEntity = new RefreshToken();
+        refreshTokenEntity.setToken(refreshToken);
+        refreshTokenEntity.setUser(user);
+        refreshTokenEntity.setExpiryDate(LocalDateTime.now().plus(refreshTokenExpiration));
+        refreshTokenEntity.setRevoked(false);
+        refreshTokenRepository.save(refreshTokenEntity);
+
         JwtAuthenticationDto jwtDto = new JwtAuthenticationDto();
-        jwtDto.setToken(generateJwtToken(email));
-        jwtDto.setRefreshToken(generateRefreshToken(email));
+        jwtDto.setToken(jwtToken);
+        jwtDto.setRefreshToken(refreshToken);
         return jwtDto;
     }
 
-    public JwtAuthenticationDto refreshBaseToken(String email, String refreshToken) {
-        JwtAuthenticationDto jwtDto = new JwtAuthenticationDto();
-        jwtDto.setToken(generateJwtToken(email));
-        jwtDto.setRefreshToken(refreshToken);
-        return jwtDto;
+    @Transactional
+    public JwtAuthenticationDto refreshBaseToken(String email, String oldRefreshToken) {
+        // Проверяем, существует ли и не отозван ли старый refresh токен
+        RefreshToken storedToken = refreshTokenRepository.findByToken(oldRefreshToken)
+                .orElseThrow(() -> new AuthException("Invalid refresh token"));
+
+        if (storedToken.isRevoked()) {
+            throw new AuthException("Refresh token has been revoked");
+        }
+
+        if (storedToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            refreshTokenRepository.delete(storedToken);
+            throw new AuthException("Refresh token expired");
+        }
+
+        // Отзываем старый токен
+        storedToken.setRevoked(true);
+        refreshTokenRepository.save(storedToken);
+
+        // Генерируем новые токены
+        return generateAuthToken(email);
     }
 
     public String getEmailFromToken(String token) {
@@ -58,7 +103,6 @@ public class JwtService {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-
             return true;
         } catch (ExpiredJwtException ex) {
             log.error("Expired JwtException", ex);
@@ -71,8 +115,26 @@ public class JwtService {
         } catch (Exception ex) {
             log.error("Invalid token", ex);
         }
-
         return false;
+    }
+
+    public boolean validateRefreshToken(String token) {
+        try {
+            if (!validateJwtToken(token)) {
+                return false;
+            }
+
+            RefreshToken storedToken = refreshTokenRepository.findByToken(token)
+                    .orElse(null);
+
+            return storedToken != null &&
+                    !storedToken.isRevoked() &&
+                    storedToken.getExpiryDate().isAfter(LocalDateTime.now());
+
+        } catch (Exception ex) {
+            log.error("Error validating refresh token", ex);
+            return false;
+        }
     }
 
     private String generateJwtToken(String email) {
