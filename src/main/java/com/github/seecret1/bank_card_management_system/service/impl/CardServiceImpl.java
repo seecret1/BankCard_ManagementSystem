@@ -162,27 +162,18 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public void delete(String cardCriterial, String userCriterial) {
-        log.info("Delete card by card criterial: {}", cardCriterial);
-        var user = userRepository.findByCriterial(userCriterial)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "User not found by criterial: " + userCriterial
-                ));
-
-        var cardsList = user.getCards();
-        log.debug("Delete card by criterial: {}, and user by criterial: {}",
+        log.info("Delete card by criterial, cardCriterial: {}, userCriterial: {}",
                 cardCriterial, userCriterial);
 
-        var card = findByCriterial(cardCriterial);
+        var card = cardRepository.findCardAndUserByCriterial(cardCriterial, userCriterial)
+                .orElseThrow(() -> new CardNotFoundException(
+                        MessageFormat.format(
+                                "The card with criterial {0} was not found for this user: {1}",
+                                cardCriterial, userCriterial
+                        )
+                ));
 
-        if (!cardsList.contains(cardMapper.toEntity(card, user))) {
-            throw new CardNotFoundException(
-                    MessageFormat.format(
-                            "The card width criterial {0} was not found for this user: {1}, ",
-                            cardCriterial, user)
-            );
-        }
-
-        cardRepository.delete(cardMapper.toEntity(card, user));
+        cardRepository.delete(card);
         log.info("Delete card successful");
     }
 
@@ -199,7 +190,7 @@ public class CardServiceImpl implements CardService {
                     "The amount cannot be negative"
             );
         }
-        if (cardFrom.getBalance().compareTo(amount) >= 0) {
+        if (cardFrom.getBalance().compareTo(amount) < 0) {
             throw new InvalidTransferException(
                     "Card balance < transfer amount"
             );
