@@ -85,13 +85,12 @@ public class CardServiceImpl implements CardService {
         log.info("Find cards by user criterial: {}, page: {}, size: {}",
                 userCriterial, pageModel.getNumber(), pageModel.getSize());
 
-        if (!userRepository.existsById(userCriterial)) {
-            throw new UserNotFoundException(
-                    "User not found by criterial: " + userCriterial
-            );
-        }
         Pageable pageable = pageModel.toPageRequest();
         var page = cardRepository.findAllByUserCriterial(userCriterial, pageable);
+
+        if (page.isEmpty() && !userRepository.existsUserByCriterial(userCriterial)) {
+            throw new UserNotFoundException("User not found by criterial: " + userCriterial);
+        }
         log.debug("Found {} cards for user {}, total pages: {}",
                 page.getContent().size(), userCriterial, page.getTotalPages());
 
