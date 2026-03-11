@@ -7,8 +7,8 @@ import com.github.seecret1.bank_card_management_system.dto.response.UserInfoResp
 import com.github.seecret1.bank_card_management_system.entity.Card;
 import com.github.seecret1.bank_card_management_system.entity.User;
 import com.github.seecret1.bank_card_management_system.entity.enums.CardStatus;
-import com.github.seecret1.bank_card_management_system.util.CardHashUtil;
-import com.github.seecret1.bank_card_management_system.util.CardMaskUtil;
+import com.github.seecret1.bank_card_management_system.utils.CardHashUtils;
+import com.github.seecret1.bank_card_management_system.utils.CardMaskUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public final class CardMapper {
 
     public CardResponse toDtoResponse(Card card) {
         CardResponse dto = new CardResponse();
-        dto.setNumber(CardMaskUtil.maskCardNumber(card.getNumber()));
+        dto.setNumber(CardMaskUtils.maskCardNumber(card.getNumber()));
         dto.setDateActivation(card.getDateActivation());
         dto.setDateExpiry(card.getDateExpiry());
         dto.setStatus(card.getStatus());
@@ -102,7 +102,7 @@ public final class CardMapper {
     public CardSummaryResponse toResponse(Card card) {
         CardSummaryResponse dto = new CardSummaryResponse();
         dto.setNumber(card.getNumber());
-        dto.setNumber(CardMaskUtil.maskCardNumber(card.getNumber()));
+        dto.setNumber(CardMaskUtils.maskCardNumber(card.getNumber()));
         dto.setStatus(card.getStatus());
         dto.setBalance(card.getBalance());
 
@@ -112,7 +112,7 @@ public final class CardMapper {
     public Card toEntity(CardRequest request, User user) {
         Card card = new Card();
         card.setNumber(request.getNumber());
-        card.setNumberHash(CardHashUtil.hash(request.getNumber()));
+        card.setNumberHash(CardHashUtils.hash(request.getNumber()));
         card.setDateActivation(request.getDateActivation());
         card.setDateExpiry(request.getDateExpiry());
         card.setBalance(request.getBalance());

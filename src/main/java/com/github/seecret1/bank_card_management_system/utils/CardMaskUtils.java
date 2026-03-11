@@ -1,6 +1,6 @@
-package com.github.seecret1.bank_card_management_system.util;
+package com.github.seecret1.bank_card_management_system.utils;
 
-public class CardMaskUtil {
+public class CardMaskUtils {
 
     public static String maskCardNumber(String cardNumber) {
         if (cardNumber == null || cardNumber.length() < 4) {

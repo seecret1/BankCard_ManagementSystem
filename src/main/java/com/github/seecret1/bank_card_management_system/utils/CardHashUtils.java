@@ -1,4 +1,4 @@
-package com.github.seecret1.bank_card_management_system.util;
+package com.github.seecret1.bank_card_management_system.utils;
 
 import org.springframework.stereotype.Component;
 
@@ -7,7 +7,7 @@ import java.security.MessageDigest;
 import java.util.Base64;
 
 @Component
-public class CardHashUtil {
+public class CardHashUtils {
 
     public static String hash(String number) {
         try {
