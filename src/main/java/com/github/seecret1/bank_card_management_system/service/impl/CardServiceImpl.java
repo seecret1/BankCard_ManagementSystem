@@ -16,7 +16,7 @@ import com.github.seecret1.bank_card_management_system.repository.CardRepository
 import com.github.seecret1.bank_card_management_system.repository.UserRepository;
 import com.github.seecret1.bank_card_management_system.repository.specification.CardSpecification;
 import com.github.seecret1.bank_card_management_system.service.CardService;
-import com.github.seecret1.bank_card_management_system.util.CardHashUtil;
+import com.github.seecret1.bank_card_management_system.utils.CardHashUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.InvalidParameterException;
@@ -106,7 +106,7 @@ public class CardServiceImpl implements CardService {
         String criterial = request.getUserCriterial();
         log.info("Creating a user card, criterial: {}", criterial);
 
-        String hash = CardHashUtil.hash(request.getNumber());
+        String hash = CardHashUtils.hash(request.getNumber());
         if (cardRepository.existsByNumberHash(hash)) {
             throw new CardExistsException(
                     "Card with number " + request.getNumber() + " already exists"
@@ -133,7 +133,7 @@ public class CardServiceImpl implements CardService {
     public CardResponse updateStatus(UpdateStatusCardRequest request) {
         log.info("Update status for card: {}", request.getNumber());
 
-        String hash = CardHashUtil.hash(request.getNumber());
+        String hash = CardHashUtils.hash(request.getNumber());
         var card = cardRepository.findByNumberHash(hash)
                 .orElseThrow(() -> new CardNotFoundException(
                         "Card not found by number: " + request.getNumber()
@@ -196,11 +196,11 @@ public class CardServiceImpl implements CardService {
         String numberFrom = request.getNumberFrom();
         String numberTo = request.getNumberTo();
 
-        var cardFrom = cardRepository.findByNumberHash(CardHashUtil.hash(numberFrom))
+        var cardFrom = cardRepository.findByNumberHash(CardHashUtils.hash(numberFrom))
                 .orElseThrow(() -> new CardNotFoundException(
                         "Card not found by number: " + numberFrom
                 ));
-        var cardTo = cardRepository.findByNumberHash(CardHashUtil.hash(numberTo))
+        var cardTo = cardRepository.findByNumberHash(CardHashUtils.hash(numberTo))
                 .orElseThrow(() -> new CardNotFoundException(
                         "Card not found by number: " + numberTo
                 ));
@@ -275,7 +275,7 @@ public class CardServiceImpl implements CardService {
             }
         }
 
-        String hash = CardHashUtil.hash(criterial);
+        String hash = CardHashUtils.hash(criterial);
         Optional<Card> byHash = cardRepository.findByNumberHash(hash);
         if (byHash.isPresent()) {
             log.debug("Card found by number hash: {}", criterial);
