@@ -9,6 +9,7 @@ import com.github.seecret1.bank_card_management_system.dto.response.PageResponse
 import com.github.seecret1.bank_card_management_system.model.CardFilterModel;
 import com.github.seecret1.bank_card_management_system.model.PageModel;
 import com.github.seecret1.bank_card_management_system.service.CardService;
+import com.github.seecret1.bank_card_management_system.utils.AuthUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -44,19 +45,22 @@ public class CardController {
     }
 
     @GetMapping("/{criterial}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<CardResponse> findByCriterial(
             @PathVariable String criterial
     ) {
         return ResponseEntity.ok(cardService.findByCriterial(criterial));
     }
 
-    @GetMapping("/your/{userCriterial}")
+    @GetMapping("/your")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<PageResponse<CardResponse>> findYourCards(
-            @PathVariable String userCriterial,
             @Valid PageModel pageModel
     ) {
-        return ResponseEntity.ok(cardService.findYourCards(userCriterial, pageModel));
+        return ResponseEntity.ok(cardService.findYourCards(
+                AuthUtils.getAuthenticatedUser().getId(),
+                pageModel
+        ));
     }
 
     @PostMapping("/create")
@@ -77,6 +81,7 @@ public class CardController {
     }
 
     @PostMapping("/transfer")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<List<CardSummaryResponse>> transferMoney(
             @Valid @RequestBody TransferMoneyRequest request
     ) {
@@ -84,14 +89,15 @@ public class CardController {
     }
 
     @PostMapping("/transfer/your")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<List<CardSummaryResponse>> transferMoneyYourCards(
             @Valid @RequestBody TransferMoneyRequest request
     ) {
         return ResponseEntity.ok(cardService.transferMoneyYourCards(request));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/delete/{cardCriterial}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteCards(
             @PathVariable String cardCriterial
     ) {

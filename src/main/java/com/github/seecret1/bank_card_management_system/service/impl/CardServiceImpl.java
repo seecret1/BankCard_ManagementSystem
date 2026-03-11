@@ -16,6 +16,7 @@ import com.github.seecret1.bank_card_management_system.repository.CardRepository
 import com.github.seecret1.bank_card_management_system.repository.UserRepository;
 import com.github.seecret1.bank_card_management_system.repository.specification.CardSpecification;
 import com.github.seecret1.bank_card_management_system.service.CardService;
+import com.github.seecret1.bank_card_management_system.utils.AuthUtils;
 import com.github.seecret1.bank_card_management_system.utils.CardHashUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +76,10 @@ public class CardServiceImpl implements CardService {
     @Override
     public CardResponse findByCriterial(String criterial) {
         log.info("Find card by criterial: {}", criterial);
+
         var card = findCardByCriterial(criterial);
+        AuthUtils.checkCardAccess(card);
+
         log.debug("Find by criterial card: {}", card);
         return cardMapper.toDtoResponse(card);
     }
@@ -174,6 +178,9 @@ public class CardServiceImpl implements CardService {
         List<Card> cards = startTransfer(request);
         var cardFrom = cards.get(0);
         var cardTo = cards.get(1);
+
+        AuthUtils.checkCardAccess(cardFrom);
+        AuthUtils.checkCardAccess(cardTo);
 
         if (!cardFrom.getUser().getId().equals(cardTo.getUser().getId())) {
             throw new InvalidTransferException("The numbers listed do not belong to the same user");

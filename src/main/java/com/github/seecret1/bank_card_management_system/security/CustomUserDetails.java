@@ -10,6 +10,8 @@ import java.util.Collections;
 
 public record CustomUserDetails(User user) implements UserDetails {
 
+    public String getId() { return user.getId(); }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(() -> user.getRole().toString());
