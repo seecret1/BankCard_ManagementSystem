@@ -75,7 +75,7 @@ public class CardController {
     @PutMapping("/update")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CardResponse> updateCard(
-            @RequestBody UpdateStatusCardRequest request
+            @Valid @RequestBody UpdateStatusCardRequest request
     ) {
         return ResponseEntity.ok(cardService.updateStatus(request));
     }
