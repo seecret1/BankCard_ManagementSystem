@@ -43,13 +43,11 @@ public class JwtService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AuthException("User not found"));
 
-        // Отзываем все предыдущие refresh токены пользователя
         refreshTokenRepository.revokeAllByUserId(user.getId());
 
         String jwtToken = generateJwtToken(email);
         String refreshToken = generateRefreshToken(email);
 
-        // Сохраняем новый refresh токен в БД
         RefreshToken refreshTokenEntity = new RefreshToken();
         refreshTokenEntity.setToken(refreshToken);
         refreshTokenEntity.setUser(user);
@@ -65,7 +63,6 @@ public class JwtService {
 
     @Transactional
     public JwtAuthenticationDto refreshBaseToken(String email, String oldRefreshToken) {
-        // Проверяем, существует ли и не отозван ли старый refresh токен
         RefreshToken storedToken = refreshTokenRepository.findByToken(oldRefreshToken)
                 .orElseThrow(() -> new AuthException("Invalid refresh token"));
 
@@ -78,11 +75,9 @@ public class JwtService {
             throw new AuthException("Refresh token expired");
         }
 
-        // Отзываем старый токен
         storedToken.setRevoked(true);
         refreshTokenRepository.save(storedToken);
 
-        // Генерируем новые токены
         return generateAuthToken(email);
     }
 
@@ -123,7 +118,6 @@ public class JwtService {
             if (!validateJwtToken(token)) {
                 return false;
             }
-
             RefreshToken storedToken = refreshTokenRepository.findByToken(token)
                     .orElse(null);
 
