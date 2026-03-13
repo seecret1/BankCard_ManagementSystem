@@ -24,29 +24,29 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/sign-in/email")
-    public ResponseEntity<JwtAuthenticationDto> singInByEmail(
-            @RequestBody SignInByEmailRequest request
+    public ResponseEntity<JwtAuthenticationDto> signInByEmail(
+            @Valid @RequestBody SignInByEmailRequest request
     ) {
-        return ResponseEntity.ok(authService.singIn(request));
+        return ResponseEntity.ok(authService.signIn(request));
     }
 
     @PostMapping("/sign-in/username")
-    public ResponseEntity<JwtAuthenticationDto> singInByUsername(
-            @RequestBody SignInByUsernameRequest request
+    public ResponseEntity<JwtAuthenticationDto> signInByUsername(
+            @Valid @RequestBody SignInByUsernameRequest request
     ) {
-        return ResponseEntity.ok(authService.singIn(request));
+        return ResponseEntity.ok(authService.signIn(request));
     }
 
     @PostMapping("/sign-up")
     public ResponseEntity<JwtAuthenticationDto> signUp(
             @Valid @RequestBody CreateUserRequest request
     ) {
-        return ResponseEntity.ok(authService.singUp(request));
+        return ResponseEntity.ok(authService.signUp(request));
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<JwtAuthenticationDto> refreshToken(
-            @RequestBody RefreshTokenRequest request
+            @Valid @RequestBody RefreshTokenRequest request
     ) {
         return ResponseEntity.ok(authService.refreshToken(request));
     }

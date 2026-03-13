@@ -8,11 +8,11 @@ import com.github.seecret1.bank_card_management_system.dto.request.SignInByEmail
 
 public interface AuthService {
 
-    JwtAuthenticationDto singIn(SignInByEmailRequest request);
+    JwtAuthenticationDto signIn(SignInByEmailRequest request);
 
-    JwtAuthenticationDto singIn(SignInByUsernameRequest request);
+    JwtAuthenticationDto signIn(SignInByUsernameRequest request);
 
-    JwtAuthenticationDto singUp(CreateUserRequest request);
+    JwtAuthenticationDto signUp(CreateUserRequest request);
 
     JwtAuthenticationDto refreshToken(RefreshTokenRequest request);
 }

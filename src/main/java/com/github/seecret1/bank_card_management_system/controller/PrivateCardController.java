@@ -1,15 +1,12 @@
 package com.github.seecret1.bank_card_management_system.controller;
 
 import com.github.seecret1.bank_card_management_system.dto.request.CardRequest;
-import com.github.seecret1.bank_card_management_system.dto.request.TransferMoneyRequest;
 import com.github.seecret1.bank_card_management_system.dto.request.UpdateStatusCardRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.CardResponse;
-import com.github.seecret1.bank_card_management_system.dto.response.CardSummaryResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
 import com.github.seecret1.bank_card_management_system.model.CardFilterModel;
 import com.github.seecret1.bank_card_management_system.model.PageModel;
 import com.github.seecret1.bank_card_management_system.service.CardService;
-import com.github.seecret1.bank_card_management_system.utils.AuthUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,13 +15,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Validated
 @RestController
-@RequestMapping("/api/v1/cards")
+@RequestMapping("/api/v1/private/cards")
 @RequiredArgsConstructor
-public class CardController {
+public class PrivateCardController {
 
     private final CardService cardService;
 
@@ -39,31 +34,12 @@ public class CardController {
     @GetMapping("/filter")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<PageResponse<CardResponse>> findCardsByFilter(
-            @Valid @RequestBody CardFilterModel filter
+            @Valid CardFilterModel filter
     ) {
         return ResponseEntity.ok(cardService.findByFilter(filter));
     }
 
-    @GetMapping("/{criterial}")
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<CardResponse> findByCriterial(
-            @PathVariable String criterial
-    ) {
-        return ResponseEntity.ok(cardService.findByCriterial(criterial));
-    }
-
-    @GetMapping("/your")
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<PageResponse<CardResponse>> findYourCards(
-            @Valid PageModel pageModel
-    ) {
-        return ResponseEntity.ok(cardService.findYourCards(
-                AuthUtils.getAuthenticatedUser().getId(),
-                pageModel
-        ));
-    }
-
-    @PostMapping("/create")
+    @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CardResponse> createCard(
             @Valid @RequestBody CardRequest cardRequest
@@ -72,7 +48,7 @@ public class CardController {
                 .body(cardService.create(cardRequest));
     }
 
-    @PutMapping("/update")
+    @PutMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CardResponse> updateCard(
             @Valid @RequestBody UpdateStatusCardRequest request
@@ -80,23 +56,7 @@ public class CardController {
         return ResponseEntity.ok(cardService.updateStatus(request));
     }
 
-    @PostMapping("/transfer")
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<List<CardSummaryResponse>> transferMoney(
-            @Valid @RequestBody TransferMoneyRequest request
-    ) {
-        return ResponseEntity.ok(cardService.transferMoney(request));
-    }
-
-    @PostMapping("/transfer/your")
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<List<CardSummaryResponse>> transferMoneyYourCards(
-            @Valid @RequestBody TransferMoneyRequest request
-    ) {
-        return ResponseEntity.ok(cardService.transferMoneyYourCards(request));
-    }
-
-    @DeleteMapping("/delete/{cardCriterial}")
+    @DeleteMapping("/{cardCriterial}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteCards(
             @PathVariable String cardCriterial

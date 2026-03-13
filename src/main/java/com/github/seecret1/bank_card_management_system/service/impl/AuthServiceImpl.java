@@ -29,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public JwtAuthenticationDto singIn(SignInByEmailRequest request) {
+    public JwtAuthenticationDto signIn(SignInByEmailRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UserNotFoundException(
                         "User not found by email: " + request.getEmail()
@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public JwtAuthenticationDto singIn(SignInByUsernameRequest request) {
+    public JwtAuthenticationDto signIn(SignInByUsernameRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UserNotFoundException(
                         "User not found by username: " + request.getUsername()
@@ -54,7 +54,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public JwtAuthenticationDto singUp(CreateUserRequest request) {
+    public JwtAuthenticationDto signUp(CreateUserRequest request) {
         String pass = request.getPassword();
         request.setPassword(passwordEncoder.encode(pass));
         userService.create(request);

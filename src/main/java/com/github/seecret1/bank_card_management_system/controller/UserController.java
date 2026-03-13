@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class UserController {
 
     private final UserService userService;
@@ -31,7 +33,7 @@ public class UserController {
 
     @GetMapping("/filter")
     public ResponseEntity<PageResponse<UserResponse>> findByFilter(
-            @Valid @RequestBody UserFilterModel filter
+            @Valid UserFilterModel filter
     ) {
         return ResponseEntity.ok(userService.findByFilter(filter));
     }
@@ -43,7 +45,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findByCriterial(criterial));
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<UserResponse> create(
             @Valid @RequestBody CreateUserRequest request
     ) {
@@ -51,7 +53,7 @@ public class UserController {
                 .body(userService.create(request));
     }
 
-    @PutMapping("/update/put/{criterial}")
+    @PutMapping("/{criterial}")
     public ResponseEntity<UserResponse> updateFull(
             @PathVariable String criterial,
             @Valid @RequestBody CreateUserRequest request
@@ -59,7 +61,7 @@ public class UserController {
         return ResponseEntity.ok(userService.updateFull(criterial, request));
     }
 
-    @PatchMapping("/update/path/{criterial}")
+    @PatchMapping("/{criterial}")
     public ResponseEntity<UserResponse> update(
             @PathVariable String criterial,
             @Valid @RequestBody UpdateUserRequest request
@@ -67,7 +69,7 @@ public class UserController {
         return ResponseEntity.ok(userService.update(criterial, request));
     }
 
-    @DeleteMapping("/delete/{criterial}")
+    @DeleteMapping("/{criterial}")
     public ResponseEntity<UserResponse> delete(
             @PathVariable String criterial
     ) {

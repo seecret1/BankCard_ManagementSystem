@@ -5,9 +5,18 @@ import com.github.seecret1.bank_card_management_system.security.CustomUserDetail
 import lombok.experimental.UtilityClass;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @UtilityClass
 public class AuthUtils {
+
+    public String getCurrentUserId(UserDetails userDetails) {
+        if (userDetails instanceof CustomUserDetails details) {
+            return details.getId();
+        }
+
+        throw new SecurityException("UserDetails is not instance of CustomUserDetails");
+    }
 
     public CustomUserDetails getAuthenticatedUser() {
         var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -15,7 +24,7 @@ public class AuthUtils {
         if (principal instanceof CustomUserDetails details) {
             return details;
         }
-        throw new SecurityException("Principal in security context is not instance of AppUserDetails");
+        throw new SecurityException("Principal in security context is not instance of CustomUserDetails");
     }
 
     public void checkCardAccess(Card card) {
