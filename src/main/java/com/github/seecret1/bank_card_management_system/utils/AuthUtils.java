@@ -14,12 +14,17 @@ public class AuthUtils {
         if (userDetails instanceof CustomUserDetails details) {
             return details.getId();
         }
-
         throw new SecurityException("UserDetails is not instance of CustomUserDetails");
     }
 
     public CustomUserDetails getAuthenticatedUser() {
-        var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new SecurityException("User is not authenticated");
+        }
+
+        var principal = authentication.getPrincipal();
 
         if (principal instanceof CustomUserDetails details) {
             return details;
