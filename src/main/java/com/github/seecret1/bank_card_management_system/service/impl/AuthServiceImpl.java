@@ -4,12 +4,16 @@ import com.github.seecret1.bank_card_management_system.dto.JwtAuthenticationDto;
 import com.github.seecret1.bank_card_management_system.dto.request.*;
 import com.github.seecret1.bank_card_management_system.entity.User;
 import com.github.seecret1.bank_card_management_system.exception.AuthException;
+import com.github.seecret1.bank_card_management_system.repository.RefreshTokenRepository;
+import com.github.seecret1.bank_card_management_system.security.CustomUserDetails;
 import com.github.seecret1.bank_card_management_system.security.jwt.JwtService;
 import com.github.seecret1.bank_card_management_system.service.AuthService;
 import com.github.seecret1.bank_card_management_system.service.InternalUserService;
 import com.github.seecret1.bank_card_management_system.service.UserService;
+import com.github.seecret1.bank_card_management_system.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,27 +29,54 @@ public class AuthServiceImpl implements AuthService {
 
     private final JwtService jwtService;
 
+    private final RefreshTokenRepository refreshTokenRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public JwtAuthenticationDto signIn(SignInByEmailRequest request) {
+        log.info("Sign in user by email: {}", request.getEmail());
         var user = internalUserService.findUserEntityByCriterial(request.getEmail());
+        log.debug("Success sign in user by email. User: {}", user);
         return authenticate(user, request.getPassword());
     }
 
     @Override
     public JwtAuthenticationDto signIn(SignInByUsernameRequest request) {
+        log.info("Sign in user by username: {}", request.getUsername());
         var user = internalUserService.findUserEntityByCriterial(request.getUsername());
+        log.debug("Success sign in user by username. User: {}", user);
         return authenticate(user, request.getPassword());
     }
 
     @Override
     @Transactional
     public JwtAuthenticationDto signUp(CreateUserRequest request) {
-        String pass = request.getPassword();
-        request.setPassword(passwordEncoder.encode(pass));
+        log.info("Sign up user. User email: {}; username: {}",
+                request.getEmail(), request.getUsername());
+
+        request.setPassword(passwordEncoder
+                .encode(request.getPassword())
+        );
         userService.create(request);
+        log.debug("User successful sign up: {}", request.getEmail());
         return jwtService.generateAuthToken(request.getEmail());
+    }
+
+    @Override
+    @Transactional
+    public void signOut(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new AuthException("Refresh token required for sign out");
+        }
+
+        CustomUserDetails userDetails = AuthUtils.getAuthenticatedUser();
+        log.info("Sign out user: {}", userDetails.getUsername());
+
+        refreshTokenRepository.revokeByToken(refreshToken);
+        SecurityContextHolder.clearContext();
+
+        log.debug("Successful user sign out. User: {}", userDetails);
     }
 
     @Override
