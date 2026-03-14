@@ -58,7 +58,7 @@ public class PrivateCardController {
 
     @DeleteMapping("/{cardCriterial}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> deleteCards(
+    public ResponseEntity<Void> deleteCards(
             @PathVariable String cardCriterial
     ) {
         cardService.delete(cardCriterial);

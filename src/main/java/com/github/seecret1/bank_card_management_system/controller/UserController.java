@@ -70,7 +70,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{criterial}")
-    public ResponseEntity<UserResponse> delete(
+    public ResponseEntity<Void> delete(
             @PathVariable String criterial
     ) {
         userService.delete(criterial);
