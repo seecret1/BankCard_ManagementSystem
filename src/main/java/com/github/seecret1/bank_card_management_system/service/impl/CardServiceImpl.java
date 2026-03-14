@@ -81,7 +81,7 @@ public class CardServiceImpl implements CardService {
         AuthUtils.checkCardAccess(card);
 
         log.debug("Find by criterial card: {}", card);
-        return cardMapper.toDtoResponse(card);
+        return cardMapper.toYourDtoResponse(card);
     }
 
     @Override

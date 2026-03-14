@@ -12,22 +12,27 @@ import com.github.seecret1.bank_card_management_system.model.PageModel;
 import com.github.seecret1.bank_card_management_system.model.UserFilterModel;
 import com.github.seecret1.bank_card_management_system.repository.UserRepository;
 import com.github.seecret1.bank_card_management_system.repository.specification.UserSpecification;
+import com.github.seecret1.bank_card_management_system.service.InternalUserService;
 import com.github.seecret1.bank_card_management_system.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, InternalUserService {
 
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public PageResponse<UserResponse> findAllUsers(PageModel pageModel) {
@@ -73,6 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponse create(CreateUserRequest request) {
         log.info("Call method create");
 
@@ -94,18 +100,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponse updateFull(String id, CreateUserRequest request) {
         log.info("Update user by id: {}", id);
 
-        var userToUpdate = userMapper.toEntity(request);
-        userToUpdate.setId(id);
-        userRepository.save(userToUpdate);
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User not found with id: " + id
+                ));
 
-        log.debug("Success full update user: {}", userToUpdate);
-        return userMapper.toResponse(userToUpdate);
+        existingUser.setUsername(request.getUsername());
+        existingUser.setEmail(request.getEmail());
+        existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
+        existingUser.setFirstName(request.getFirstName());
+        existingUser.setLastName(request.getLastName());
+        existingUser.setMiddleName(request.getMiddleName());
+        existingUser.setBirthDate(request.getBirthDate());
+        existingUser.setRole(request.getRole());
+
+        User savedUser = userRepository.save(existingUser);
+
+        log.debug("Success full update user: {}", savedUser);
+        return userMapper.toResponse(savedUser);
     }
 
     @Override
+    @Transactional
     public UserResponse update(String criterial, UpdateUserRequest request) {
         log.info("Update user by criterial: {}", criterial);
 
@@ -121,7 +141,7 @@ public class UserServiceImpl implements UserService {
             userUpdate.setEmail(request.getEmail());
         }
         if (request.getPassword() != null) {
-            userUpdate.setPassword(request.getPassword());
+            userUpdate.setPassword(passwordEncoder.encode(request.getPassword()));
         }
         userRepository.save(userUpdate);
         log.debug("Success update user: {}", userUpdate);
@@ -137,5 +157,16 @@ public class UserServiceImpl implements UserService {
                 ));
         log.debug("Success delete user: {}", user);
         userRepository.delete(user);
+    }
+
+    @Override
+    public User findUserEntityByCriterial(String criterial) {
+        log.info("Find user entity by criterial: {}", criterial);
+        User user = userRepository.findByCriterial(criterial)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User not found by criterial: " + criterial
+                ));
+        log.debug("Found user entity by criterial. User: {}", user);
+        return user;
     }
 }

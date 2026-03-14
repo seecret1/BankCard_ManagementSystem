@@ -14,5 +14,7 @@ public interface AuthService {
 
     JwtAuthenticationDto signUp(CreateUserRequest request);
 
+//    void signOut();
+
     JwtAuthenticationDto refreshToken(RefreshTokenRequest request);
 }
