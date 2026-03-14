@@ -8,6 +8,7 @@ import com.github.seecret1.bank_card_management_system.dto.request.SignInByUsern
 import com.github.seecret1.bank_card_management_system.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class AuthController {
     public ResponseEntity<JwtAuthenticationDto> signUp(
             @Valid @RequestBody CreateUserRequest request
     ) {
-        return ResponseEntity.ok(authService.signUp(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.signUp(request));
     }
 
     @PostMapping("/sign-out")
