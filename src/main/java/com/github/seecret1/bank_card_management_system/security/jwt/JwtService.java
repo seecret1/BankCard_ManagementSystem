@@ -40,36 +40,32 @@ public class JwtService {
 
     @Transactional
     public JwtAuthenticationDto generateAuthToken(String email) {
+        log.info("Generating auth token for user: {}", email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AuthException("User not found"));
 
         refreshTokenRepository.revokeAllByUserId(user.getId());
+        return createNewTokenPair(user);
+    }
 
-        String jwtToken = generateJwtToken(email);
-        String refreshToken = generateRefreshToken(email);
+    private JwtAuthenticationDto generateNewRefreshToken(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AuthException("User not found"));
 
-        RefreshToken refreshTokenEntity = new RefreshToken();
-        refreshTokenEntity.setToken(refreshToken);
-        refreshTokenEntity.setUser(user);
-        refreshTokenEntity.setExpiryDate(LocalDateTime.now().plus(refreshTokenExpiration));
-        refreshTokenEntity.setRevoked(false);
-        refreshTokenRepository.save(refreshTokenEntity);
-
-        JwtAuthenticationDto jwtDto = new JwtAuthenticationDto();
-        jwtDto.setToken(jwtToken);
-        jwtDto.setRefreshToken(refreshToken);
-        return jwtDto;
+        log.debug("Keeping other refresh tokens active for user: {}", email);
+        return createNewTokenPair(user);
     }
 
     @Transactional
     public JwtAuthenticationDto refreshBaseToken(String email, String oldRefreshToken) {
+
+        log.info("Generating refresh token for user: {}", email);
         RefreshToken storedToken = refreshTokenRepository.findByToken(oldRefreshToken)
                 .orElseThrow(() -> new AuthException("Invalid refresh token"));
 
         if (storedToken.isRevoked()) {
             throw new AuthException("Refresh token has been revoked");
         }
-
         if (storedToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(storedToken);
             throw new AuthException("Refresh token expired");
@@ -78,7 +74,7 @@ public class JwtService {
         storedToken.setRevoked(true);
         refreshTokenRepository.save(storedToken);
 
-        return generateAuthToken(email);
+        return generateNewRefreshToken(email);
     }
 
     public String getEmailFromToken(String token) {
@@ -129,6 +125,25 @@ public class JwtService {
             log.error("Error validating refresh token", ex);
             return false;
         }
+    }
+
+    private JwtAuthenticationDto createNewTokenPair(User user) {
+        String jwtToken = generateJwtToken(user.getEmail());
+        String refreshToken = generateRefreshToken(user.getEmail());
+
+        RefreshToken refreshTokenEntity = new RefreshToken();
+        refreshTokenEntity.setToken(refreshToken);
+        refreshTokenEntity.setUser(user);
+        refreshTokenEntity.setExpiryDate(LocalDateTime.now().plus(refreshTokenExpiration));
+        refreshTokenEntity.setRevoked(false);
+        refreshTokenRepository.save(refreshTokenEntity);
+
+        JwtAuthenticationDto jwtDto = new JwtAuthenticationDto();
+        jwtDto.setToken(jwtToken);
+        jwtDto.setRefreshToken(refreshToken);
+
+        log.debug("Created new token pair for user: {}", user.getEmail());
+        return jwtDto;
     }
 
     private String generateJwtToken(String email) {

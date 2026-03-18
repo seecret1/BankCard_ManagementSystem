@@ -9,6 +9,7 @@ import com.github.seecret1.bank_card_management_system.security.CustomUserDetail
 import com.github.seecret1.bank_card_management_system.security.jwt.JwtService;
 import com.github.seecret1.bank_card_management_system.service.AuthService;
 import com.github.seecret1.bank_card_management_system.service.InternalUserService;
+import com.github.seecret1.bank_card_management_system.service.SessionService;
 import com.github.seecret1.bank_card_management_system.service.UserService;
 import com.github.seecret1.bank_card_management_system.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +30,14 @@ public class AuthServiceImpl implements AuthService {
 
     private final JwtService jwtService;
 
+    private final SessionService sessionService;
+
     private final RefreshTokenRepository refreshTokenRepository;
 
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public JwtAuthenticationDto signIn(SignInByEmailRequest request) {
         log.info("Sign in user by email: {}", request.getEmail());
         var user = internalUserService.findUserEntityByCriterial(request.getEmail());
@@ -42,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public JwtAuthenticationDto signIn(SignInByUsernameRequest request) {
         log.info("Sign in user by username: {}", request.getUsername());
         var user = internalUserService.findUserEntityByCriterial(request.getUsername());
@@ -60,7 +65,13 @@ public class AuthServiceImpl implements AuthService {
         );
         userService.create(request);
         log.debug("User successful sign up: {}", request.getEmail());
-        return jwtService.generateAuthToken(request.getEmail());
+
+        var user = internalUserService.findUserEntityByCriterial(request.getEmail());
+
+        JwtAuthenticationDto authDto = jwtService.generateAuthToken(request.getEmail());
+        sessionService.createSession(user.getId(), authDto.getRefreshToken());
+
+        return authDto;
     }
 
     @Override
@@ -73,6 +84,7 @@ public class AuthServiceImpl implements AuthService {
         CustomUserDetails userDetails = AuthUtils.getAuthenticatedUser();
         log.info("Sign out user: {}", userDetails.getUsername());
 
+        sessionService.removeSession(refreshToken);
         refreshTokenRepository.revokeByToken(refreshToken);
         SecurityContextHolder.clearContext();
 
@@ -80,9 +92,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public JwtAuthenticationDto refreshToken(RefreshTokenRequest refreshTokenRequest) {
         String refreshToken = refreshTokenRequest.getRefreshToken();
 
+        if (!sessionService.isSessionActive(refreshToken)) {
+            throw new AuthException("Session is not active. Please sign in again");
+        }
         if (!jwtService.validateRefreshToken(refreshToken)) {
             throw new AuthException("Invalid or expired refresh token");
         }
@@ -90,13 +106,23 @@ public class AuthServiceImpl implements AuthService {
         String email = jwtService.getEmailFromToken(refreshToken);
         log.info("User requested refresh token by email: {}", email);
 
-        return jwtService.refreshBaseToken(email, refreshToken);
+        JwtAuthenticationDto newAuthDto = jwtService.refreshBaseToken(email, refreshToken);
+        sessionService.removeSession(refreshToken);
+
+        User user = internalUserService.findUserEntityByCriterial(email);
+        sessionService.createSession(user.getId(), newAuthDto.getRefreshToken());
+
+        return newAuthDto;
     }
 
     private JwtAuthenticationDto authenticate(User user, String password) {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new AuthException("Invalid credentials");
         }
-        return jwtService.generateAuthToken(user.getEmail());
+        JwtAuthenticationDto authDto = jwtService.generateAuthToken(user.getEmail());
+        sessionService.createSession(user.getId(), authDto.getRefreshToken());
+
+        log.info("User successfully authenticated: {}, created new session", user.getEmail());
+        return authDto;
     }
 }
