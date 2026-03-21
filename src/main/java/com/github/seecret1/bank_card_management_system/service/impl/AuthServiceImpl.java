@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -34,7 +35,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public JwtAuthenticationDto signIn(SignInByEmailRequest request) {
         log.info("Sign in user by email: {}", request.getEmail());
         var user = internalUserService.findUserEntityByCriterial(request.getEmail());
@@ -43,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public JwtAuthenticationDto signIn(SignInByUsernameRequest request) {
         log.info("Sign in user by username: {}", request.getUsername());
         var user = internalUserService.findUserEntityByCriterial(request.getUsername());
@@ -52,7 +53,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public JwtAuthenticationDto signUp(CreateUserRequest request) {
         log.info("Sign up user. User email: {}; username: {}",
                 request.getEmail(), request.getUsername());
@@ -67,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void signOut(String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
             throw new AuthException("Refresh token required for sign out");
@@ -83,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public JwtAuthenticationDto refreshToken(RefreshTokenRequest refreshTokenRequest) {
         String refreshToken = refreshTokenRequest.getRefreshToken();
 

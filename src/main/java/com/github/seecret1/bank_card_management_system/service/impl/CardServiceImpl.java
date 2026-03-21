@@ -21,8 +21,10 @@ import com.github.seecret1.bank_card_management_system.utils.CardHashUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.InvalidParameterException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -42,6 +44,7 @@ public class CardServiceImpl implements CardService {
     private final CardMapper cardMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<CardResponse> findAll(PageModel pageModel) {
         log.info("Find all page cards");
 
@@ -59,6 +62,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<CardResponse> findByFilter(CardFilterModel filter) {
         log.info("Find card by filter: {}", filter);
         var page = cardRepository.findAll(
@@ -74,6 +78,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CardResponse findByCriterial(String criterial) {
         log.info("Find card by criterial: {}", criterial);
 
@@ -85,6 +90,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<CardResponse> findYourCards(String userCriterial, PageModel pageModel) {
         log.info("Find cards by user criterial: {}, page: {}, size: {}",
                 userCriterial, pageModel.getNumber(), pageModel.getSize());
@@ -106,16 +112,10 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public CardResponse create(CardRequest request) {
         String criterial = request.getUserCriterial();
         log.info("Creating a user card, criterial: {}", criterial);
-
-        String hash = CardHashUtils.hash(request.getNumber());
-        if (cardRepository.existsByNumberHash(hash)) {
-            throw new CardExistsException(
-                    "Card with number " + request.getNumber() + " already exists"
-            );
-        }
 
         var user = userRepository.findByCriterial(criterial)
                 .orElseThrow(() -> new UserNotFoundException(
@@ -127,13 +127,23 @@ public class CardServiceImpl implements CardService {
                     "Date expiry is before now!"
             );
         }
-        var card = cardRepository.save(cardMapper.toEntity(request, user));
-        log.debug("Created card: {}", card);
-        log.info("Create card successful");
-        return cardMapper.toDtoResponse(card);
+        try {
+            var card = cardRepository.save(cardMapper.toEntity(request, user));
+
+            log.debug("Created card: {}", card);
+            log.info("Create card successful");
+
+            return cardMapper.toDtoResponse(card);
+
+        } catch (DataIntegrityViolationException ex) {
+            throw new CardExistsException(
+                    "Card with number " + request.getNumber() + " already exists!"
+            );
+        }
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public CardResponse updateStatus(UpdateStatusCardRequest request) {
         log.info("Update status for card: {}", request.getNumber());
 
@@ -160,7 +170,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<CardSummaryResponse> transferMoney(TransferMoneyRequest request) {
 
         List<Card> cards = startTransfer(request);
@@ -172,7 +182,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<CardSummaryResponse> transferMoneyYourCards(TransferMoneyRequest request) {
 
         List<Card> cards = startTransfer(request);
@@ -191,6 +201,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void delete(String criterial) {
         log.info("Delete card by criterial: {}", criterial);
         var card = findCardByCriterial(criterial);
@@ -261,10 +272,8 @@ public class CardServiceImpl implements CardService {
 
     private boolean checkCardValid(Card card) {
         if (card.getDateExpiry().isBefore(LocalDate.now())) {
-            updateStatus(new UpdateStatusCardRequest(
-                    card.getNumber(),
-                    CardStatus.EXPIRED
-            ));
+            card.setStatus(CardStatus.EXPIRED);
+            cardRepository.save(card);
             return false;
         }
 
