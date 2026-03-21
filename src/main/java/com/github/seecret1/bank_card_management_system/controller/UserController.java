@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class UserController {
 
     private final UserService userService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<PageResponse<UserResponse>> findAll(
             @Valid PageModel pageModel
     ) {
@@ -32,6 +32,7 @@ public class UserController {
     }
 
     @GetMapping("/filter")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<PageResponse<UserResponse>> findByFilter(
             @Valid UserFilterModel filter
     ) {
@@ -39,6 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/{criterial}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<UserResponse> findByCriterial(
             @PathVariable String criterial
     ) {
@@ -46,6 +48,7 @@ public class UserController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<UserResponse> create(
             @Valid @RequestBody CreateUserRequest request
     ) {
@@ -54,6 +57,7 @@ public class UserController {
     }
 
     @PutMapping("/{criterial}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<UserResponse> updateFull(
             @PathVariable String criterial,
             @Valid @RequestBody CreateUserRequest request
@@ -62,6 +66,7 @@ public class UserController {
     }
 
     @PatchMapping("/{criterial}")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<UserResponse> update(
             @PathVariable String criterial,
             @Valid @RequestBody UpdateUserRequest request
@@ -70,6 +75,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{criterial}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> delete(
             @PathVariable String criterial
     ) {
