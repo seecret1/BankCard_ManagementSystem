@@ -2,10 +2,7 @@ package com.github.seecret1.bank_card_management_system.unit.controller;
 
 import com.github.seecret1.bank_card_management_system.controller.AuthController;
 import com.github.seecret1.bank_card_management_system.dto.JwtAuthenticationDto;
-import com.github.seecret1.bank_card_management_system.dto.request.CreateUserRequest;
-import com.github.seecret1.bank_card_management_system.dto.request.RefreshTokenRequest;
-import com.github.seecret1.bank_card_management_system.dto.request.SignInByEmailRequest;
-import com.github.seecret1.bank_card_management_system.dto.request.SignInByUsernameRequest;
+import com.github.seecret1.bank_card_management_system.dto.request.*;
 import com.github.seecret1.bank_card_management_system.entity.enums.RoleType;
 import com.github.seecret1.bank_card_management_system.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +32,7 @@ public class AuthControllerTest {
 
     private SignInByUsernameRequest signInByUsernameRequest;
     private SignInByEmailRequest signInByEmailRequest;
+    private SignUpRequest signUpRequest;
     private CreateUserRequest createUserRequest;
     private RefreshTokenRequest refreshTokenRequest;
     private JwtAuthenticationDto jwtAuthenticationDto;
@@ -67,9 +65,9 @@ public class AuthControllerTest {
 
     @Test
     void signUp_ReturnTokens() {
-        when(authService.signUp(any(CreateUserRequest.class))).thenReturn(jwtAuthenticationDto);
+        when(authService.signUp(any(SignUpRequest.class))).thenReturn(jwtAuthenticationDto);
 
-        ResponseEntity<JwtAuthenticationDto> response = authController.signUp(createUserRequest);
+        ResponseEntity<JwtAuthenticationDto> response = authController.signUp(signUpRequest);
 
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getToken()).isEqualTo(JWT_TOKEN);
