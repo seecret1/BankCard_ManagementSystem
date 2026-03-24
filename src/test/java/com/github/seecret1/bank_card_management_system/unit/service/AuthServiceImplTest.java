@@ -228,7 +228,8 @@ class AuthServiceImplTest {
     @Test
     @DisplayName("Should throw exception when signing out with blank refresh token")
     void signOut_BlankRefreshToken_ThrowsException() {
-        assertThatThrownBy(() -> authService.signOut("   "))
+        RefreshTokenRequest request = new RefreshTokenRequest("   ");
+        assertThatThrownBy(() -> authService.signOut(request))
                 .isInstanceOf(AuthException.class)
                 .hasMessage("Refresh token required for sign out");
 

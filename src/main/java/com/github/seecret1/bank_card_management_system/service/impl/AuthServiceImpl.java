@@ -69,13 +69,24 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void signOut(String refreshToken) {
-        if (refreshToken == null || refreshToken.isBlank()) {
-            throw new AuthException("Refresh token required for sign out");
+    public void signOut(RefreshTokenRequest request) {
+        String refreshToken = request.getRefreshToken();
+
+        var refreshTokenEntity = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> new AuthException(
+                        "Refresh token not found!"
+                ));
+
+        if (refreshTokenEntity.isRevoked()) {
+            throw new AuthException("User sign out using this token");
         }
 
         CustomUserDetails userDetails = AuthUtils.getAuthenticatedUser();
         log.info("Sign out user: {}", userDetails.getUsername());
+
+        if (!refreshTokenEntity.getUser().getId().equals(userDetails.getId())) {
+            throw new AuthException("Refresh token does not belong to current user");
+        }
 
         refreshTokenRepository.revokeByToken(refreshToken);
         SecurityContextHolder.clearContext();
@@ -84,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public JwtAuthenticationDto refreshToken(RefreshTokenRequest refreshTokenRequest) {
         String refreshToken = refreshTokenRequest.getRefreshToken();
 

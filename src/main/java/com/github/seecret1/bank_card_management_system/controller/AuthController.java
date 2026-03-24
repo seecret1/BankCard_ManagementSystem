@@ -46,7 +46,7 @@ public class AuthController {
     public ResponseEntity<Void> signOut(
             @Valid @RequestBody RefreshTokenRequest request
     ) {
-        authService.signOut(request.getRefreshToken());
+        authService.signOut(request);
         return ResponseEntity.noContent().build();
     }
 
