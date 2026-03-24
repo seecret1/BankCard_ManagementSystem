@@ -4,6 +4,7 @@ import com.github.seecret1.bank_card_management_system.dto.JwtAuthenticationDto;
 import com.github.seecret1.bank_card_management_system.dto.request.*;
 import com.github.seecret1.bank_card_management_system.entity.User;
 import com.github.seecret1.bank_card_management_system.exception.AuthException;
+import com.github.seecret1.bank_card_management_system.mapper.UserMapper;
 import com.github.seecret1.bank_card_management_system.repository.RefreshTokenRepository;
 import com.github.seecret1.bank_card_management_system.security.CustomUserDetails;
 import com.github.seecret1.bank_card_management_system.security.jwt.JwtService;
@@ -25,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthServiceImpl implements AuthService {
 
     private final UserService userService;
+
+    private final UserMapper userMapper;
 
     private final InternalUserService internalUserService;
 
@@ -54,11 +57,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public JwtAuthenticationDto signUp(CreateUserRequest request) {
+    public JwtAuthenticationDto signUp(SignUpRequest request) {
         log.info("Sign up user. User email: {}; username: {}",
                 request.getEmail(), request.getUsername());
 
-        userService.create(request);
+        userService.create(userMapper.toCreateUserRequest(request));
         log.debug("User successful sign up: {}", request.getEmail());
 
         return jwtService.generateAuthToken(request.getEmail());

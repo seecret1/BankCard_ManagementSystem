@@ -1,10 +1,7 @@
 package com.github.seecret1.bank_card_management_system.unit.service;
 
 import com.github.seecret1.bank_card_management_system.dto.JwtAuthenticationDto;
-import com.github.seecret1.bank_card_management_system.dto.request.CreateUserRequest;
-import com.github.seecret1.bank_card_management_system.dto.request.RefreshTokenRequest;
-import com.github.seecret1.bank_card_management_system.dto.request.SignInByEmailRequest;
-import com.github.seecret1.bank_card_management_system.dto.request.SignInByUsernameRequest;
+import com.github.seecret1.bank_card_management_system.dto.request.*;
 import com.github.seecret1.bank_card_management_system.entity.User;
 import com.github.seecret1.bank_card_management_system.entity.enums.RoleType;
 import com.github.seecret1.bank_card_management_system.exception.AuthException;
@@ -54,6 +51,7 @@ class AuthServiceImplTest {
     private AuthServiceImpl authService;
 
     private User user;
+    private SignUpRequest signUpRequest;
     private CreateUserRequest createUserRequest;
     private SignInByEmailRequest signInByEmailRequest;
     private SignInByUsernameRequest signInByUsernameRequest;
@@ -203,7 +201,7 @@ class AuthServiceImplTest {
         when(userService.create(any(CreateUserRequest.class))).thenReturn(null);
         when(jwtService.generateAuthToken(EMAIL)).thenReturn(jwtAuthenticationDto);
 
-        JwtAuthenticationDto result = authService.signUp(createUserRequest);
+        JwtAuthenticationDto result = authService.signUp(signUpRequest);
 
         assertThat(result).isNotNull();
         assertThat(result.getToken()).isEqualTo(JWT_TOKEN);
