@@ -1,10 +1,7 @@
 package com.github.seecret1.bank_card_management_system.controller;
 
 import com.github.seecret1.bank_card_management_system.dto.JwtAuthenticationDto;
-import com.github.seecret1.bank_card_management_system.dto.request.CreateUserRequest;
-import com.github.seecret1.bank_card_management_system.dto.request.RefreshTokenRequest;
-import com.github.seecret1.bank_card_management_system.dto.request.SignInByEmailRequest;
-import com.github.seecret1.bank_card_management_system.dto.request.SignInByUsernameRequest;
+import com.github.seecret1.bank_card_management_system.dto.request.*;
 import com.github.seecret1.bank_card_management_system.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +34,7 @@ public class AuthController {
 
     @PostMapping("/sign-up")
     public ResponseEntity<JwtAuthenticationDto> signUp(
-            @Valid @RequestBody CreateUserRequest request
+            @Valid @RequestBody SignUpRequest request
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.signUp(request));
     }

@@ -1,6 +1,7 @@
 package com.github.seecret1.bank_card_management_system.mapper;
 
 import com.github.seecret1.bank_card_management_system.dto.request.CreateUserRequest;
+import com.github.seecret1.bank_card_management_system.dto.request.SignUpRequest;
 import com.github.seecret1.bank_card_management_system.dto.response.UserInfoResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.UserResponse;
 import com.github.seecret1.bank_card_management_system.entity.User;
@@ -48,6 +49,19 @@ public final class UserMapper {
         response.setCards(cardMapper.toResponseList(user.getCards()));
 
         return response;
+    }
+
+    public CreateUserRequest toCreateUserRequest(SignUpRequest request) {
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setUsername(request.getUsername());
+        createUserRequest.setEmail(request.getEmail());
+        createUserRequest.setPassword(request.getPassword());
+        createUserRequest.setFirstName(request.getFirstName());
+        createUserRequest.setLastName(request.getLastName());
+        createUserRequest.setMiddleName(request.getMiddleName());
+        createUserRequest.setBirthDate(request.getBirthDate());
+        createUserRequest.setRole(RoleType.ROLE_USER);
+        return createUserRequest;
     }
 
     public List<UserResponse> toListResponse(List<User> users) {
