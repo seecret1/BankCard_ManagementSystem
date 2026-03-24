@@ -35,7 +35,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public JwtAuthenticationDto signIn(SignInByEmailRequest request) {
         log.info("Sign in user by email: {}", request.getEmail());
         var user = internalUserService.findUserEntityByCriterial(request.getEmail());
@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public JwtAuthenticationDto signIn(SignInByUsernameRequest request) {
         log.info("Sign in user by username: {}", request.getUsername());
         var user = internalUserService.findUserEntityByCriterial(request.getUsername());
