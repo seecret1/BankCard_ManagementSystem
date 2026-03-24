@@ -7,6 +7,11 @@ import com.github.seecret1.bank_card_management_system.dto.response.PageResponse
 import com.github.seecret1.bank_card_management_system.model.CardFilterModel;
 import com.github.seecret1.bank_card_management_system.model.PageModel;
 import com.github.seecret1.bank_card_management_system.service.CardService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,12 +24,20 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/private/cards")
 @RequiredArgsConstructor
+@Tag(name = "Card Management (Admin)", description = "Admin API for card management")
+@SecurityRequirement(name = "bearerAuth")
 public class PrivateCardController {
 
     private final CardService cardService;
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Get all cards", description = "Retrieve paginated list of all cards")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success get all cards"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public ResponseEntity<PageResponse<CardResponse>> findAllCards(
             @Valid PageModel pageModel
     ) {
@@ -33,6 +46,12 @@ public class PrivateCardController {
 
     @GetMapping("/filter")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Get cards by filter", description = "Retrieve paginated list of cards by filter")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success get cards by filter"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public ResponseEntity<PageResponse<CardResponse>> findCardsByFilter(
             @Valid CardFilterModel filter
     ) {
@@ -41,6 +60,12 @@ public class PrivateCardController {
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Create card", description = "Create new card")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Success create new card"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public ResponseEntity<CardResponse> createCard(
             @Valid @RequestBody CardRequest cardRequest
     ) {
@@ -50,6 +75,12 @@ public class PrivateCardController {
 
     @PutMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Update status", description = "Update card status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success update status card"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public ResponseEntity<CardResponse> updateCard(
             @Valid @RequestBody UpdateStatusCardRequest request
     ) {
@@ -58,6 +89,12 @@ public class PrivateCardController {
 
     @DeleteMapping("/{cardCriterial}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Delete card", description = "Delete card by criterial")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success delete card"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public ResponseEntity<Void> deleteCards(
             @PathVariable String cardCriterial
     ) {

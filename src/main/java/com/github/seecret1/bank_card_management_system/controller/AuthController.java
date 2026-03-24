@@ -3,6 +3,13 @@ package com.github.seecret1.bank_card_management_system.controller;
 import com.github.seecret1.bank_card_management_system.dto.JwtAuthenticationDto;
 import com.github.seecret1.bank_card_management_system.dto.request.*;
 import com.github.seecret1.bank_card_management_system.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,15 +17,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Validated
+@Tag(name = "Authentication", description = "Authentication and authorization API")
 public class AuthController {
 
     private final AuthService authService;
 
     @PostMapping("/sign-in/email")
+    @Operation(summary = "Sign in by email", description = "Authenticate user using email and password")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully authenticated",
+                    content = @Content(schema = @Schema(implementation = JwtAuthenticationDto.class))
+            ),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
     public ResponseEntity<JwtAuthenticationDto> signInByEmail(
             @Valid @RequestBody SignInByEmailRequest request
     ) {
@@ -26,6 +44,12 @@ public class AuthController {
     }
 
     @PostMapping("/sign-in/username")
+    @Operation(summary = "Sign in by username", description = "Authenticate user using username and password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully authenticated"),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
     public ResponseEntity<JwtAuthenticationDto> signInByUsername(
             @Valid @RequestBody SignInByUsernameRequest request
     ) {
@@ -33,6 +57,12 @@ public class AuthController {
     }
 
     @PostMapping("/sign-up")
+    @Operation(summary = "Register new user", description = "Create a new user account")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User successfully registered"),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "409", description = "User already exists")
+    })
     public ResponseEntity<JwtAuthenticationDto> signUp(
             @Valid @RequestBody SignUpRequest request
     ) {
@@ -40,6 +70,13 @@ public class AuthController {
     }
 
     @PostMapping("/sign-out")
+    @Operation(summary = "Sign out", description = "Logout user and invalidate refresh token")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Successfully logged out"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Refresh token not found")
+    })
     public ResponseEntity<Void> signOut(
             @Valid @RequestBody RefreshTokenRequest request
     ) {
@@ -48,6 +85,11 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @Operation(summary = "Refresh token", description = "Get new access token using refresh token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "New token generated"),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials")
+    })
     public ResponseEntity<JwtAuthenticationDto> refreshToken(
             @Valid @RequestBody RefreshTokenRequest request
     ) {

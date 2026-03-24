@@ -8,6 +8,11 @@ import com.github.seecret1.bank_card_management_system.model.PageModel;
 import com.github.seecret1.bank_card_management_system.model.UserFilterModel;
 import com.github.seecret1.bank_card_management_system.service.UserService;
 import com.github.seecret1.bank_card_management_system.utils.AuthUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,12 +27,20 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
+@Tag(name = "User Management", description = "API for managing users")
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
     private final UserService userService;
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Get all users", description = "Retrieve paginated list of all users (Admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success get all users"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public ResponseEntity<PageResponse<UserResponse>> findAll(
             @Valid PageModel pageModel
     ) {
@@ -36,6 +49,12 @@ public class UserController {
 
     @GetMapping("/filter")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Get users by filter", description = "Retrieve paginated list of all users by filter (Admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success get users by filter"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public ResponseEntity<PageResponse<UserResponse>> findByFilter(
             @Valid UserFilterModel filter
     ) {
@@ -44,6 +63,12 @@ public class UserController {
 
     @GetMapping("/{criterial}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Get user by criterial", description = "Find user by ID, username or email (Admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success get user by ID, username or email"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public ResponseEntity<UserResponse> findByCriterial(
             @PathVariable String criterial
     ) {
@@ -52,6 +77,12 @@ public class UserController {
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Create user", description = "Create new user (Admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Success create new user"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public ResponseEntity<UserResponse> create(
             @Valid @RequestBody CreateUserRequest request
     ) {
@@ -61,6 +92,12 @@ public class UserController {
 
     @PutMapping("/{criterial}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Full update user", description = "Update all user fields (Admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success full update"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public ResponseEntity<UserResponse> updateFull(
             @PathVariable String criterial,
             @Valid @RequestBody CreateUserRequest request
@@ -70,6 +107,12 @@ public class UserController {
 
     @PatchMapping
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @Operation(summary = "Update own profile", description = "Update current user's profile")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success update user`s profile"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public ResponseEntity<UserResponse> updateYour(
             @Valid @RequestBody UpdateUserRequest request,
             @AuthenticationPrincipal UserDetails userDetails
@@ -82,6 +125,15 @@ public class UserController {
 
     @DeleteMapping("/{criterial}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Delete user", description = "Delete user by ID, username or email (Admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Success delete user by ID, username or email"
+            ),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     public ResponseEntity<Void> delete(
             @PathVariable String criterial
     ) {
