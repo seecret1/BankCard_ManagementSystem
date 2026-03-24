@@ -32,7 +32,3 @@ user-service:
 
 encryption:
   secret: ${ENCRYPTION_SECRET}
-
-app:
-  max-active-sessions: 3
-  session-timeout: 7d

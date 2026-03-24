@@ -5,6 +5,7 @@ import com.github.seecret1.bank_card_management_system.dto.request.UpdateUserReq
 import com.github.seecret1.bank_card_management_system.dto.response.PageResponse;
 import com.github.seecret1.bank_card_management_system.dto.response.UserResponse;
 import com.github.seecret1.bank_card_management_system.entity.User;
+import com.github.seecret1.bank_card_management_system.exception.AuthException;
 import com.github.seecret1.bank_card_management_system.exception.RegisterUserException;
 import com.github.seecret1.bank_card_management_system.exception.UserNotFoundException;
 import com.github.seecret1.bank_card_management_system.mapper.UserMapper;
@@ -16,9 +17,11 @@ import com.github.seecret1.bank_card_management_system.service.InternalUserServi
 import com.github.seecret1.bank_card_management_system.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
@@ -35,6 +38,7 @@ public class UserServiceImpl implements UserService, InternalUserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<UserResponse> findAllUsers(PageModel pageModel) {
         log.info("Find all users");
 
@@ -51,6 +55,7 @@ public class UserServiceImpl implements UserService, InternalUserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<UserResponse> findByFilter(UserFilterModel filter) {
         log.info("Find users by filter: {}", filter);
 
@@ -67,6 +72,7 @@ public class UserServiceImpl implements UserService, InternalUserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponse findByCriterial(String criterial) {
         log.info("Find user by criterial: {}", criterial);
         User user = userRepository.findByCriterial(criterial)
@@ -78,7 +84,7 @@ public class UserServiceImpl implements UserService, InternalUserService {
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public UserResponse create(CreateUserRequest request) {
         log.info("Call method create");
 
@@ -93,20 +99,22 @@ public class UserServiceImpl implements UserService, InternalUserService {
                     )
             );
         }
+        User user = userMapper.toEntity(request);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
 
-        User user = userRepository.save(userMapper.toEntity(request));
         log.debug("Success create user: {}", user);
         return userMapper.toResponse(user);
     }
 
     @Override
-    @Transactional
-    public UserResponse updateFull(String id, CreateUserRequest request) {
-        log.info("Update user by id: {}", id);
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public UserResponse updateFull(String criterial, CreateUserRequest request) {
+        log.info("Full update user by criterial: {}", criterial);
 
-        User existingUser = userRepository.findById(id)
+        User existingUser = userRepository.findByCriterial(criterial)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "User not found with id: " + id
+                        "User not found with criterial: " + criterial
                 ));
 
         existingUser.setUsername(request.getUsername());
@@ -125,30 +133,36 @@ public class UserServiceImpl implements UserService, InternalUserService {
     }
 
     @Override
-    @Transactional
-    public UserResponse update(String criterial, UpdateUserRequest request) {
-        log.info("Update user by criterial: {}", criterial);
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public UserResponse updateYour(String userId, UpdateUserRequest request) {
+        log.info("Update user by id: {}", userId);
 
-        var userUpdate = userRepository.findByCriterial(criterial)
+        var userUpdate = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "User not found with criterial: " + criterial
+                        "User not found with id: " + userId
                 ));
+        try {
+            if (request.getUsername() != null) {
+                userUpdate.setUsername(request.getUsername());
+            }
+            if (request.getEmail() != null) {
+                userUpdate.setEmail(request.getEmail());
+            }
+            if (request.getPassword() != null) {
+                userUpdate.setPassword(passwordEncoder.encode(request.getPassword()));
+            }
 
-        if (request.getUsername() != null) {
-            userUpdate.setUsername(request.getUsername());
+            userRepository.save(userUpdate);
+            log.debug("Success update user: {}", userUpdate);
+            return userMapper.toResponse(userUpdate);
+
+        } catch (DataIntegrityViolationException ex) {
+            throw new AuthException(ex.getMessage());
         }
-        if (request.getEmail() != null) {
-            userUpdate.setEmail(request.getEmail());
-        }
-        if (request.getPassword() != null) {
-            userUpdate.setPassword(passwordEncoder.encode(request.getPassword()));
-        }
-        userRepository.save(userUpdate);
-        log.debug("Success update user: {}", userUpdate);
-        return userMapper.toResponse(userUpdate);
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void delete(String criterial) {
         log.info("Delete user by criterial: {}", criterial);
         var user = userRepository.findByCriterial(criterial)

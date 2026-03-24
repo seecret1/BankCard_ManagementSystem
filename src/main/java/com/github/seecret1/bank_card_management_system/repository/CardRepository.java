@@ -1,13 +1,11 @@
 package com.github.seecret1.bank_card_management_system.repository;
 
 import com.github.seecret1.bank_card_management_system.entity.Card;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -29,7 +27,6 @@ public interface CardRepository extends JpaRepository<Card, String>, JpaSpecific
     Page<Card> findAllByUserCriterial(String criterial, Pageable pageable);
 
     @EntityGraph(attributePaths = {"user"})
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Card> findByNumberHash(String numberHash);
-
-    boolean existsByNumberHash(String numberHash);
 }
