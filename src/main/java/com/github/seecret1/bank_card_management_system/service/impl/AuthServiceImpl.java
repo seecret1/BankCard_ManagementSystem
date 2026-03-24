@@ -58,9 +58,6 @@ public class AuthServiceImpl implements AuthService {
         log.info("Sign up user. User email: {}; username: {}",
                 request.getEmail(), request.getUsername());
 
-        request.setPassword(passwordEncoder
-                .encode(request.getPassword())
-        );
         userService.create(request);
         log.debug("User successful sign up: {}", request.getEmail());
 

@@ -21,6 +21,7 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,6 +51,7 @@ public class AuthControllerTest {
         signInByEmailRequest = new SignInByEmailRequest(EMAIL, PASSWORD);
         refreshTokenRequest = new RefreshTokenRequest(REFRESH_TOKEN);
 
+        createUserRequest = new CreateUserRequest();
         createUserRequest.setUsername(USERNAME);
         createUserRequest.setEmail(EMAIL);
         createUserRequest.setPassword(PASSWORD);
@@ -69,10 +71,10 @@ public class AuthControllerTest {
 
         ResponseEntity<JwtAuthenticationDto> response = authController.signUp(createUserRequest);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getToken()).isEqualTo(JWT_TOKEN);
         assertThat(response.getBody().getRefreshToken()).isEqualTo(REFRESH_TOKEN);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 
     @Test
@@ -109,5 +111,14 @@ public class AuthControllerTest {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getToken()).isEqualTo(JWT_TOKEN);
         assertThat(response.getBody().getRefreshToken()).isEqualTo(REFRESH_TOKEN);
+    }
+
+    @Test
+    void signOut_ShouldReturnNoContent() {
+        RefreshTokenRequest request = new RefreshTokenRequest(REFRESH_TOKEN);
+        ResponseEntity<Void> response = authController.signOut(request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        verify(authService).signOut(request);
     }
 }
