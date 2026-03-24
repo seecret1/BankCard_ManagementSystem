@@ -99,20 +99,22 @@ public class UserServiceImpl implements UserService, InternalUserService {
                     )
             );
         }
+        User user = userMapper.toEntity(request);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
 
-        User user = userRepository.save(userMapper.toEntity(request));
         log.debug("Success create user: {}", user);
         return userMapper.toResponse(user);
     }
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public UserResponse updateFull(String id, CreateUserRequest request) {
-        log.info("Update user by id: {}", id);
+    public UserResponse updateFull(String criterial, CreateUserRequest request) {
+        log.info("Full update user by criterial: {}", criterial);
 
-        User existingUser = userRepository.findById(id)
+        User existingUser = userRepository.findByCriterial(criterial)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "User not found with id: " + id
+                        "User not found with criterial: " + criterial
                 ));
 
         existingUser.setUsername(request.getUsername());
@@ -132,12 +134,12 @@ public class UserServiceImpl implements UserService, InternalUserService {
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public UserResponse update(String criterial, UpdateUserRequest request) {
-        log.info("Update user by criterial: {}", criterial);
+    public UserResponse updateYour(String userId, UpdateUserRequest request) {
+        log.info("Update user by id: {}", userId);
 
-        var userUpdate = userRepository.findByCriterial(criterial)
+        var userUpdate = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(
-                        "User not found with criterial: " + criterial
+                        "User not found with id: " + userId
                 ));
         try {
             if (request.getUsername() != null) {

@@ -6,9 +6,6 @@ import com.github.seecret1.bank_card_management_system.dto.response.PageResponse
 import com.github.seecret1.bank_card_management_system.dto.response.UserResponse;
 import com.github.seecret1.bank_card_management_system.model.PageModel;
 import com.github.seecret1.bank_card_management_system.model.UserFilterModel;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface UserService {
 
@@ -22,7 +19,7 @@ public interface UserService {
 
     UserResponse updateFull(String criterial, CreateUserRequest request);
 
-    UserResponse update(String criterial, UpdateUserRequest request);
+    UserResponse updateYour(String userId, UpdateUserRequest request);
 
     void delete(String criterial);
 }

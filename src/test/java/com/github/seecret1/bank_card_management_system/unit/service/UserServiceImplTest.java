@@ -319,7 +319,7 @@ class UserServiceImplTest {
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toResponse(user)).thenReturn(userResponse);
 
-        UserResponse result = userService.update(USERNAME, updateUserRequest);
+        UserResponse result = userService.updateYour(USERNAME, updateUserRequest);
 
         assertThat(result).isNotNull();
         assertThat(user.getUsername()).isEqualTo("newusername123");
@@ -343,7 +343,7 @@ class UserServiceImplTest {
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toResponse(user)).thenReturn(userResponse);
 
-        UserResponse result = userService.update(USERNAME, partialRequest);
+        UserResponse result = userService.updateYour(USERNAME, partialRequest);
 
         assertThat(result).isNotNull();
         assertThat(user.getUsername()).isEqualTo("newusername123");
@@ -366,7 +366,7 @@ class UserServiceImplTest {
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toResponse(user)).thenReturn(userResponse);
 
-        UserResponse result = userService.update(USERNAME, partialRequest);
+        UserResponse result = userService.updateYour(USERNAME, partialRequest);
 
         assertThat(result).isNotNull();
         assertThat(user.getEmail()).isEqualTo("newemail@example.com");
@@ -388,7 +388,7 @@ class UserServiceImplTest {
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toResponse(user)).thenReturn(userResponse);
 
-        UserResponse result = userService.update(USERNAME, partialRequest);
+        UserResponse result = userService.updateYour(USERNAME, partialRequest);
 
         assertThat(result).isNotNull();
         assertThat(user.getPassword()).isEqualTo("encodedNewPassword");
@@ -406,7 +406,7 @@ class UserServiceImplTest {
         when(userRepository.findByCriterial(USERNAME)).thenReturn(Optional.of(user));
         when(userRepository.save(user)).thenThrow(new DataIntegrityViolationException("Duplicate entry"));
 
-        assertThatThrownBy(() -> userService.update(USERNAME, updateUserRequest))
+        assertThatThrownBy(() -> userService.updateYour(USERNAME, updateUserRequest))
                 .isInstanceOf(AuthException.class);
 
         verify(userRepository).findByCriterial(USERNAME);
@@ -418,7 +418,7 @@ class UserServiceImplTest {
     void update_UserNotFound_ThrowsException() {
         when(userRepository.findByCriterial("unknown")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.update("unknown", updateUserRequest))
+        assertThatThrownBy(() -> userService.updateYour("unknown", updateUserRequest))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessage("User not found with criterial: unknown");
 
