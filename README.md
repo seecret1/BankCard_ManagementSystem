@@ -67,7 +67,7 @@
   </p>
   <ul>
     <li><code>POSTGRES_DB=bank_db</code></li>
-    <li><code>POSTGRES_USER=pavel</code></li>
+    <li><code>POSTGRES_USER=admin</code></li>
     <li><code>POSTGRES_PASSWORD=admin</code></li>
     <li><code>host port: 5433</code> → <code>container port: 5432</code></li>
   </ul>
