@@ -86,13 +86,13 @@
 
   <h3>2) Установить переменные окружения</h3>
   <p><span>PowerShell (Windows):</span></p>
-  <pre><code>$env:USERNAME_DB="pavel"
+  <pre><code>$env:USERNAME_DB="admin"
 $env:PASSWORD_DB="admin"
 $env:SECRET_KEY="MyVeryLongAndSecureSecretKeyForJWTTokenSigningThatIsAtLeast64CharactersLongToMeetHS512Requirements123456789"
 $env:ENCRYPTION_SECRET="your-strong-secret-key-here-change-in-production"</code></pre>
 
   <p><span>Bash (Linux/macOS):</span></p>
-  <pre><code>export USERNAME_DB="pavel"
+  <pre><code>export USERNAME_DB="admin"
 export PASSWORD_DB="admin"
 export SECRET_KEY="MyVeryLongAndSecureSecretKeyForJWTTokenSigningThatIsAtLeast64CharactersLongToMeetHS512Requirements123456789"
 export ENCRYPTION_SECRET="your-strong-secret-key-here-change-in-production"</code></pre>
