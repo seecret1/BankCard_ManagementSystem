@@ -17,11 +17,7 @@ import java.time.LocalDate;
 @Table(name = "cards")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Card {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+public class Card extends BaseEntity {
 
     @Convert(converter = CardNumberConverter.class)
     @Column(columnDefinition = "TEXT")
@@ -41,22 +37,4 @@ public class Card {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    public Card(
-            String number,
-            String numberHash,
-            LocalDate dateActivation,
-            LocalDate dateExpiry,
-            CardStatus status,
-            BigDecimal balance,
-            User user
-    ) {
-        this.number = number;
-        this.numberHash = numberHash;
-        this.dateActivation = dateActivation;
-        this.dateExpiry = dateExpiry;
-        this.status = status;
-        this.balance = balance;
-        this.user = user;
-    }
 }

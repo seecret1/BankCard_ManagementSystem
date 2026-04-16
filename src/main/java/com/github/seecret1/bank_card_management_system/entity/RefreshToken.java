@@ -11,11 +11,7 @@ import java.time.LocalDateTime;
 @Table(name = "refresh_tokens")
 @AllArgsConstructor
 @NoArgsConstructor
-public class RefreshToken {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+public class RefreshToken extends BaseEntity {
 
     private String token;
 
