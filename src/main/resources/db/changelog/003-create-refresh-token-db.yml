@@ -3,7 +3,7 @@ databaseChangeLog:
       id: create_refresh_token_tables
       author: seecret1
       preConditions:
-        - onFail: CONTINUE
+        - onFail: MARK_RAN
           and:
             - tableExists:
                 tableName: users
@@ -52,7 +52,6 @@ databaseChangeLog:
                   name: updated_at
                   type: TIMESTAMP
                   defaultValueComputed: CURRENT_TIMESTAMP
-
         - addForeignKeyConstraint:
             constraintName: fk_refresh_token_user
             baseTableName: refresh_tokens

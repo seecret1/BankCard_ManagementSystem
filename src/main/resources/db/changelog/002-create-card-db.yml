@@ -3,13 +3,10 @@ databaseChangeLog:
       id: create_cards_tables
       author: seecret1
       preConditions:
-        - onFail: WARN
+        - onFail: MARK_RAN
+          not:
             - tableExists:
-              tableName: users
-        - onFail: HALT
-            - not:
-              - tableExists:
-                  tableName: cards
+                tableName: cards
       changes:
         - createTable:
             tableName: cards
@@ -49,6 +46,7 @@ databaseChangeLog:
               - column:
                   name: balance
                   type: DECIMAL(10,2)
+                  defaultValue: 0.00
                   constraints:
                     nullable: false
               - column:
@@ -66,7 +64,6 @@ databaseChangeLog:
                   name: updated_at
                   type: TIMESTAMP
                   defaultValueComputed: CURRENT_TIMESTAMP
-
         - addForeignKeyConstraint:
             constraintName: fk_card_owner
             baseTableName: cards
