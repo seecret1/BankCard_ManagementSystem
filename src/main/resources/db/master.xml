@@ -2,7 +2,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include file="classpath:db/changelog/001-create-user-db.yml" relativeToChangelogFile="false"/>
-    <include file="classpath:db/changelog/002-create-card-db.yml" relativeToChangelogFile="false"/>
-    <include file="classpath:db/changelog/003-create-refresh-token-db.yml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/001-create-user-db.yml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/002-create-card-db.yml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/003-create-refresh-token-db.yml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

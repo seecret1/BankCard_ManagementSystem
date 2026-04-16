@@ -2,6 +2,14 @@ databaseChangeLog:
   - changeSet:
       id: create_cards_tables
       author: seecret1
+      preConditions:
+        - onFail: WARN
+            - tableExists:
+              tableName: users
+        - onFail: HALT
+            - not:
+              - tableExists:
+                  tableName: cards
       changes:
         - createTable:
             tableName: cards

@@ -2,6 +2,14 @@ databaseChangeLog:
   - changeSet:
       id: create_refresh_token_tables
       author: seecret1
+      preConditions:
+        - onFail: CONTINUE
+          and:
+            - tableExists:
+                tableName: users
+            - not:
+                - tableExists:
+                    tableName: refresh_tokens
       changes:
         - createTable:
             tableName: refresh_tokens
