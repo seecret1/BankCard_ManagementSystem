@@ -22,6 +22,4 @@ public class RefreshToken extends BaseEntity {
     private LocalDateTime expiryDate;
 
     private boolean revoked = false;
-
-    private LocalDateTime createdAt = LocalDateTime.now();
 }
