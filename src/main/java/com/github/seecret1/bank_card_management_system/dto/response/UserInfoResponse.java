@@ -3,6 +3,7 @@ package com.github.seecret1.bank_card_management_system.dto.response;
 import com.github.seecret1.bank_card_management_system.entity.enums.RoleType;
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.LocalDate;
 
 @Data
@@ -21,4 +22,14 @@ public class UserInfoResponse {
     private LocalDate birthDate;
 
     private RoleType role;
+
+    private Instant createdAt;
+
+    private Instant updatedAt;
+
+    private Instant deletedAt;
+
+    private boolean deleted;
+
+    private String deletedBy;
 }

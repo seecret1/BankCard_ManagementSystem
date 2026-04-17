@@ -11,6 +11,8 @@ public interface UserService {
 
     PageResponse<UserResponse> findAllUsers(PageModel pageModel);
 
+    PageResponse<UserResponse> findAllActiveUsers(PageModel pageModel);
+
     PageResponse<UserResponse> findByFilter(UserFilterModel filter);
 
     UserResponse findByCriterial(String criterial);
@@ -21,5 +23,5 @@ public interface UserService {
 
     UserResponse updateYour(String userId, UpdateUserRequest request);
 
-    void delete(String criterial);
+    void delete(String deletedBy, String criterial);
 }

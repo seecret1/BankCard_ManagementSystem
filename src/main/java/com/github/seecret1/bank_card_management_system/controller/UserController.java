@@ -47,6 +47,20 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllUsers(pageModel));
     }
 
+    @GetMapping("/active")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Get all active users", description = "Retrieve paginated list of all active users (Admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success get all active users"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
+    public ResponseEntity<PageResponse<UserResponse>> findAllActiveUsers(
+            @Valid PageModel pageModel
+    ) {
+        return ResponseEntity.ok(userService.findAllActiveUsers(pageModel));
+    }
+
     @GetMapping("/filter")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Get users by filter", description = "Retrieve paginated list of all users by filter (Admin only)")
@@ -135,9 +149,13 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public ResponseEntity<Void> delete(
-            @PathVariable String criterial
+            @PathVariable String criterial,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        userService.delete(criterial);
+        userService.delete(
+                AuthUtils.getCurrentUserId(userDetails),
+                criterial
+        );
         return ResponseEntity.noContent().build();
     }
 }
