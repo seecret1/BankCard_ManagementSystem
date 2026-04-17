@@ -1,13 +1,35 @@
-version: "3.8"
-
 services:
-  postgres-event:
-    image: postgres:latest
+  postgres:
+    image: postgres:16-alpine
+    container_name: bank_postgres
     environment:
-      - POSTGRES_DB=bank_db
-      - POSTGRES_USER=pavel
-      - POSTGRES_PASSWORD=admin
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${USERNAME_DB}
+      POSTGRES_PASSWORD: ${PASSWORD_DB}
     ports:
-      - "5433:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USERNAME_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: bank_app
+    ports:
+      - "${APP_PORT}:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${USERNAME_DB}
+      SPRING_DATASOURCE_PASSWORD: ${PASSWORD_DB}
+      SECRET_KEY: ${SECRET_KEY}
+      ENCRYPTION_SECRET: ${ENCRYPTION_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

@@ -46,6 +46,11 @@ public final class UserMapper {
         response.setMiddleName(middleName);
         response.setBirthDate(birthDate);
         response.setRole(role);
+        response.setCreatedAt(user.getCreatedAt());
+        response.setUpdatedAt(user.getUpdatedAt());
+        response.setDeleted(user.isDeleted());
+        response.setDeletedAt(user.getDeletedAt());
+        response.setDeletedBy(user.getDeletedBy());
         response.setCards(cardMapper.toResponseList(user.getCards()));
 
         return response;

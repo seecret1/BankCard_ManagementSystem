@@ -19,7 +19,7 @@ public class UserFilterModel {
     @Builder.Default
     private PageModel page = new PageModel(0, 10);
 
-    private String firsName;
+    private String firstName;
 
     private String lastName;
 
@@ -28,4 +28,6 @@ public class UserFilterModel {
     private LocalDate birthDate;
 
     private RoleType role;
+
+    private boolean deleted;
 }

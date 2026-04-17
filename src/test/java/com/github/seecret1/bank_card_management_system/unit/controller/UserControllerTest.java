@@ -83,7 +83,7 @@ class UserControllerTest {
         userResponse = new UserResponse(
                 USER_ID, USERNAME, EMAIL,
                 FIRST_NAME, LAST_NAME, MIDDLE_NAME,
-                BIRTH_DATE, ROLE, cards
+                BIRTH_DATE, ROLE, null, null, false, null, null, cards
         );
 
         pageResponse = new PageResponse<UserResponse>();
@@ -218,12 +218,16 @@ class UserControllerTest {
 
     @Test
     void delete_ShouldReturnNoContent() {
-        doNothing().when(userService).delete(USERNAME);
+        try (MockedStatic<AuthUtils> authUtilsMock = Mockito.mockStatic(AuthUtils.class)) {
+            authUtilsMock.when(() -> AuthUtils.getCurrentUserId(userDetails))
+                    .thenReturn(USER_ID);
+            doNothing().when(userService).delete(USER_ID, USERNAME);
 
-        ResponseEntity<Void> response = userController.delete(USERNAME);
+            ResponseEntity<Void> response = userController.delete(USERNAME, userDetails);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        verify(userService).delete(USERNAME);
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+            verify(userService).delete(USER_ID, USERNAME);
+        }
     }
 
     @Test
@@ -258,6 +262,7 @@ class UserControllerTest {
                 null,
                 LocalDate.of(1990, 1, 1),
                 RoleType.ROLE_USER,
+                null, null, false, null, null,
                 cards
         );
 
@@ -275,7 +280,7 @@ class UserControllerTest {
     void findByFilter_WithAllFilters_ShouldReturnFilteredUsers() {
         UserFilterModel fullFilter = UserFilterModel.builder()
                 .page(pageModel)
-                .firsName(FIRST_NAME)
+                .firstName(FIRST_NAME)
                 .lastName(LAST_NAME)
                 .middleName(MIDDLE_NAME)
                 .birthDate(BIRTH_DATE)
@@ -291,12 +296,16 @@ class UserControllerTest {
 
     @Test
     void delete_WithEmail_ShouldDeleteUser() {
-        doNothing().when(userService).delete(EMAIL);
+        try (MockedStatic<AuthUtils> authUtilsMock = Mockito.mockStatic(AuthUtils.class)) {
+            authUtilsMock.when(() -> AuthUtils.getCurrentUserId(userDetails))
+                    .thenReturn(USER_ID);
+            doNothing().when(userService).delete(USER_ID, EMAIL);
 
-        ResponseEntity<Void> response = userController.delete(EMAIL);
+            ResponseEntity<Void> response = userController.delete(EMAIL, userDetails);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        verify(userService).delete(EMAIL);
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+            verify(userService).delete(USER_ID, EMAIL);
+        }
     }
 
     @Test

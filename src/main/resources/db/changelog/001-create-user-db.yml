@@ -2,6 +2,12 @@ databaseChangeLog:
   - changeSet:
       id: create_users_table
       author: seecret1
+      preConditions:
+        - onFail: MARK_RAN
+          onError: HALT
+          not:
+            - tableExists:
+                tableName: users
       changes:
         - createTable:
             tableName: users
@@ -42,8 +48,6 @@ databaseChangeLog:
               - column:
                   name: middle_name
                   type: VARCHAR(100)
-                  constraints:
-                    nullable: true
               - column:
                   name: birth_date
                   type: date
@@ -54,3 +58,23 @@ databaseChangeLog:
                   type: VARCHAR(15)
                   constraints:
                     nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP
+              - column:
+                  name: deleted_by
+                  type: VARCHAR(100)

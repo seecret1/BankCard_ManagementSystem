@@ -56,6 +56,23 @@ public class UserServiceImpl implements UserService, InternalUserService {
 
     @Override
     @Transactional(readOnly = true)
+    public PageResponse<UserResponse> findAllActiveUsers(PageModel pageModel) {
+        log.info("Find all active users");
+
+        Pageable pageable = pageModel.toPageRequest();
+        var page = userRepository.findAllActiveUsers(pageable);
+        log.debug("Find active users list. page: {}, size list: {}, page list: {}",
+                page.getTotalPages(), page.getTotalElements(), page.getContent());
+
+        return new PageResponse<>(
+                page.getTotalElements(),
+                page.getTotalPages(),
+                userMapper.toListResponse(page.getContent())
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public PageResponse<UserResponse> findByFilter(UserFilterModel filter) {
         log.info("Find users by filter: {}", filter);
 
@@ -163,14 +180,16 @@ public class UserServiceImpl implements UserService, InternalUserService {
 
     @Override
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void delete(String criterial) {
+    public void delete(String deletedBy, String criterial) {
         log.info("Delete user by criterial: {}", criterial);
         var user = userRepository.findByCriterial(criterial)
                 .orElseThrow(() -> new UserNotFoundException(
                         "User not found by criterial: " + criterial
                 ));
         log.debug("Success delete user: {}", user);
-        userRepository.delete(user);
+
+        user.softDelete(deletedBy);
+        userRepository.save(user);
     }
 
     @Override

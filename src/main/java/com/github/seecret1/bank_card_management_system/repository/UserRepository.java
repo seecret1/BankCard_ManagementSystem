@@ -1,6 +1,7 @@
 package com.github.seecret1.bank_card_management_system.repository;
 
 import com.github.seecret1.bank_card_management_system.entity.User;
+import com.github.seecret1.bank_card_management_system.model.PageModel;
 import com.github.seecret1.bank_card_management_system.repository.specification.UserSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,9 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
 
     @Override
     Page<User> findAll(Pageable pageable);
+
+    @Query("SELECT u FROM User u WHERE u.deleted = false")
+    Page<User> findAllActiveUsers(Pageable pageable);
 
     Optional<User> findByUsername(String username);
 

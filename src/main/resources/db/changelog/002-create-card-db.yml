@@ -2,6 +2,11 @@ databaseChangeLog:
   - changeSet:
       id: create_cards_tables
       author: seecret1
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: cards
       changes:
         - createTable:
             tableName: cards
@@ -41,6 +46,7 @@ databaseChangeLog:
               - column:
                   name: balance
                   type: DECIMAL(10,2)
+                  defaultValue: 0.00
                   constraints:
                     nullable: false
               - column:
@@ -48,7 +54,16 @@ databaseChangeLog:
                   type: VARCHAR(36)
                   constraints:
                     nullable: false
-
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
         - addForeignKeyConstraint:
             constraintName: fk_card_owner
             baseTableName: cards

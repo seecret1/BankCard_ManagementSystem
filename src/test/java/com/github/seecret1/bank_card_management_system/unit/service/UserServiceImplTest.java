@@ -135,7 +135,7 @@ class UserServiceImplTest {
     @DisplayName("Should return filtered users by criteria")
     void findByFilter_ValidFilter_ReturnsFilteredUsers() {
         UserFilterModel filter = new UserFilterModel();
-        filter.setFirsName("Pavel");
+        filter.setFirstName("Pavel");
         PageModel pageModel = new PageModel(0, 10);
         filter.setPage(pageModel);
 
@@ -325,7 +325,7 @@ class UserServiceImplTest {
         assertThat(user.getUsername()).isEqualTo("newusername123");
         assertThat(user.getEmail()).isEqualTo("newemail@example.com");
         assertThat(user.getPassword()).isEqualTo("encodedNewPassword");
-        assertThat(user.getRole()).isEqualTo(RoleType.ROLE_USER);
+        assertThat(user.getRole()).isEqualTo(RoleType.ROLE_ADMIN);
 
         verify(userRepository).findByCriterial(USERNAME);
         verify(passwordEncoder).encode("newpassword123");
@@ -431,10 +431,10 @@ class UserServiceImplTest {
     void delete_ValidCriterial_DeletesUser() {
         when(userRepository.findByCriterial(USERNAME)).thenReturn(Optional.of(user));
 
-        userService.delete(USERNAME);
+        userService.delete(USER_ID, USERNAME);
 
         verify(userRepository).findByCriterial(USERNAME);
-        verify(userRepository).delete(user);
+        verify(userRepository).save(user);
     }
 
     @Test
@@ -442,11 +442,11 @@ class UserServiceImplTest {
     void delete_UserNotFound_ThrowsException() {
         when(userRepository.findByCriterial("unknown")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.delete("unknown"))
+        assertThatThrownBy(() -> userService.delete(USER_ID, "unknown"))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessage("User not found by criterial: unknown");
 
         verify(userRepository).findByCriterial("unknown");
-        verify(userRepository, never()).delete((User) any());
+        verify(userRepository, never()).save(any());
     }
 }

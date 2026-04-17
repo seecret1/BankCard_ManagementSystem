@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -28,6 +29,16 @@ public class UserResponse {
     private LocalDate birthDate;
 
     private RoleType role;
+
+    private Instant createdAt;
+
+    private Instant updatedAt;
+
+    private boolean deleted;
+
+    private Instant deletedAt;
+
+    private String deletedBy;
 
     private Set<CardSummaryResponse> cards;
 }
